@@ -1,117 +1,56 @@
 #include "pwm.h"
 
-void TIM1_PWM_Init() //  µç»úµÄPWMĞÅºÅ³õÊ¼»¯º¯Êı
+void TIM1_PWM_Init() //  ç”µæœºçš„PWMä¿¡å·åˆå§‹åŒ–å‡½æ•°
 {
 
-    TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
-    GPIO_InitTypeDef GPIO_InitStruct;								//GPIO³õÊ¼»¯ ½á¹¹Ìå±äÁ¿
-    TIM_OCInitTypeDef  TIM_OCInitStructure;
-    
+    TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
+    GPIO_InitTypeDef GPIO_InitStruct; // GPIOåˆå§‹åŒ– ç»“æ„ä½“å˜é‡
+    TIM_OCInitTypeDef TIM_OCInitStructure;
 
-	
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1|RCC_APB2Periph_GPIOA, ENABLE);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1 | RCC_APB2Periph_GPIOA, ENABLE);
 
-    GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF_PP; //GPIO²ÉÓÃ¸´ÓÃÍÆÍìÊä³öÄ£Ê½
-    GPIO_InitStruct.GPIO_Pin = GPIO_Pin_10|GPIO_Pin_11; //TIM1Í¬Ê±²úÉúÁ½Â·PWM²¨ ÔÚ¹Ü½Åa8 a11
-    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;  //GPIOËÙ¶È50MHZ
-    GPIO_Init(GPIOA,&GPIO_InitStruct);  //³õÊ¼»¯º¯Êı ÈÃ¸Õ¸ÕÅäÖÃµÄ²ÎÊı ÊäÈëµ½¶ÔÓ¦¼Ä´æÆ÷ÀïÃæ
-     
-
-
-
+    GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF_PP;          // GPIOé‡‡ç”¨å¤ç”¨æ¨æŒ½è¾“å‡ºæ¨¡å¼
+    GPIO_InitStruct.GPIO_Pin = GPIO_Pin_10 | GPIO_Pin_11; // TIM1åŒæ—¶äº§ç”Ÿä¸¤è·¯PWMæ³¢ åœ¨ç®¡è„ša8 a11
+    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;        // GPIOé€Ÿåº¦50MHZ
+    GPIO_Init(GPIOA, &GPIO_InitStruct);                   // åˆå§‹åŒ–å‡½æ•° è®©åˆšåˆšé…ç½®çš„å‚æ•° è¾“å…¥åˆ°å¯¹åº”å¯„å­˜å™¨é‡Œé¢
 
     TIM_ITConfig(TIM1, TIM_IT_Update, ENABLE);
 
-	
-    TIM_TimeBaseStructure.TIM_Period = 7200;							//ÉèÖÃÔÚÏÂÒ»¸ö¸üĞÂÊÂ¼ş×°Èë»î¶¯µÄ×Ô¶¯ÖØ×°ÔØ¼Ä´æÆ÷ÖÜÆÚµÄÖµ 80K
-    TIM_TimeBaseStructure.TIM_Prescaler =0;						//ÉèÖÃÓÃÀ´×÷Îª TIMx Ê±ÖÓÆµÂÊ³ıÊıµÄÔ¤·ÖÆµÖµ ²»·ÖÆµ
-    TIM_TimeBaseStructure.TIM_ClockDivision = 0; 					//ÉèÖÃÊ±ÖÓ·Ö¸î:TDTS = Tck_tim
-    TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up; 	//ÏòÉÏ¼ÆÊı
-    TIM_TimeBaseStructure.TIM_RepetitionCounter=0;					//ÖØ¸´¼Ä´æÆ÷£¬ÓÃÓÚ×Ô¶¯¸üĞÂ
-    TIM_TimeBaseInit(TIM1, &TIM_TimeBaseStructure); 				//¢Ú³õÊ¼»¯ TIMx
+    TIM_TimeBaseStructure.TIM_Period = 7200;                    // è®¾ç½®åœ¨ä¸‹ä¸€ä¸ªæ›´æ–°äº‹ä»¶è£…å…¥æ´»åŠ¨çš„è‡ªåŠ¨é‡è£…è½½å¯„å­˜å™¨å‘¨æœŸçš„å€¼ 80K
+    TIM_TimeBaseStructure.TIM_Prescaler = 0;                    // è®¾ç½®ç”¨æ¥ä½œä¸º TIMx æ—¶é’Ÿé¢‘ç‡é™¤æ•°çš„é¢„åˆ†é¢‘å€¼ ä¸åˆ†é¢‘
+    TIM_TimeBaseStructure.TIM_ClockDivision = 0;                // è®¾ç½®æ—¶é’Ÿåˆ†å‰²:TDTS = Tck_tim
+    TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up; // å‘ä¸Šè®¡æ•°
+    TIM_TimeBaseStructure.TIM_RepetitionCounter = 0;            // é‡å¤å¯„å­˜å™¨ï¼Œç”¨äºè‡ªåŠ¨æ›´æ–°
+    TIM_TimeBaseInit(TIM1, &TIM_TimeBaseStructure);             // â‘¡åˆå§‹åŒ– TIMx
 
-	 TIM_ARRPreloadConfig(TIM1, ENABLE);   //ÔÊĞí»ò½ûÖ¹ÔÚ¶¨Ê±Æ÷¹¤×÷Ê±ÏòARRµÄ»º³åÆ÷ÖĞĞ´ÈëĞÂÖµ£¬ÒÔ±ãÔÚ¸üĞÂÊÂ¼ş·¢ÉúÊ±ÔØÈë¸²¸ÇÒÔÇ°µÄÖµ¡£
-	       //ÉèÖÃÓÅÏÈ¼¶
+    TIM_ARRPreloadConfig(TIM1, ENABLE); // å…è®¸æˆ–ç¦æ­¢åœ¨å®šæ—¶å™¨å·¥ä½œæ—¶å‘ARRçš„ç¼“å†²å™¨ä¸­å†™å…¥æ–°å€¼ï¼Œä»¥ä¾¿åœ¨æ›´æ–°äº‹ä»¶å‘ç”Ÿæ—¶è½½å…¥è¦†ç›–ä»¥å‰çš„å€¼ã€‚
+                                        // è®¾ç½®ä¼˜å…ˆçº§
 
-    TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1; //Âö¿íµ÷ÖÆÄ£Ê½ Í¨µÀ1
-    TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable; //±È½ÏÊä³öÊ¹ÄÜ
-    TIM_OCInitStructure.TIM_OutputNState=TIM_OutputNState_Disable;//Ê¹ÄÜ»¥²¹¶ËÊä³ö
-    TIM_OCInitStructure.TIM_OCIdleState=TIM_OCIdleState_Reset; //ËÀÇøºóÊä³ö×´Ì¬
-    TIM_OCInitStructure.TIM_OCNIdleState=TIM_OCNIdleState_Reset;//ËÀÇøºó»¥²¹¶ËÊä³ö×´Ì¬
-    TIM_OCInitStructure.TIM_Pulse = 0; 							//ÉèÖÃ´ı×°Èë²¶»ñ±È½Ï¼Ä´æÆ÷µÄÂö³åÖµ
-    TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High; //Êä³ö¼«ĞÔ¸ß
-    TIM_OCInitStructure.TIM_OCNPolarity=TIM_OCNPolarity_High; //ÉèÖÃ»¥²¹¶ËÊä³ö¼«ĞÔ
-                               //Ã»ÓĞ±àĞ´ÖĞ¶Ï·şÎñº¯Êı»òÕßÔÚÖĞ¶Ï·şÎñº¯ÊıÖĞ¸ù±¾¾ÍÃ»ÓĞ¸øARR»º³åÆ÷ÖØĞÂĞ´ÈëĞÂÖµ¾¯¸æ
+    TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;                // è„‰å®½è°ƒåˆ¶æ¨¡å¼ é€šé“1
+    TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;    // æ¯”è¾ƒè¾“å‡ºä½¿èƒ½
+    TIM_OCInitStructure.TIM_OutputNState = TIM_OutputNState_Disable; // ä½¿èƒ½äº’è¡¥ç«¯è¾“å‡º
+    TIM_OCInitStructure.TIM_OCIdleState = TIM_OCIdleState_Reset;     // æ­»åŒºåè¾“å‡ºçŠ¶æ€
+    TIM_OCInitStructure.TIM_OCNIdleState = TIM_OCNIdleState_Reset;   // æ­»åŒºåäº’è¡¥ç«¯è¾“å‡ºçŠ¶æ€
+    TIM_OCInitStructure.TIM_Pulse = 0;                               // è®¾ç½®å¾…è£…å…¥æ•è·æ¯”è¾ƒå¯„å­˜å™¨çš„è„‰å†²å€¼
+    TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;        // è¾“å‡ºææ€§é«˜
+    TIM_OCInitStructure.TIM_OCNPolarity = TIM_OCNPolarity_High;      // è®¾ç½®äº’è¡¥ç«¯è¾“å‡ºææ€§
+                                                                // æ²¡æœ‰ç¼–å†™ä¸­æ–­æœåŠ¡å‡½æ•°æˆ–è€…åœ¨ä¸­æ–­æœåŠ¡å‡½æ•°ä¸­æ ¹æœ¬å°±æ²¡æœ‰ç»™ARRç¼“å†²å™¨é‡æ–°å†™å…¥æ–°å€¼è­¦å‘Š
 
+    TIM_OC3Init(TIM1, &TIM_OCInitStructure);          // â‘¢åˆå§‹åŒ–å¤–è®¾ TIMx
+    TIM_OC3PreloadConfig(TIM1, TIM_OCPreload_Enable); // CH3 é¢„è£…è½½ä½¿èƒ½
 
+    TIM_OC4Init(TIM1, &TIM_OCInitStructure);          // â‘¢åˆå§‹åŒ–å¤–è®¾ TIMx
+    TIM_OC4PreloadConfig(TIM1, TIM_OCPreload_Enable); // CH4 é¢„è£…è½½ä½¿èƒ½
 
-    TIM_OC3Init(TIM1, &TIM_OCInitStructure); 			//¢Û³õÊ¼»¯ÍâÉè TIMx
-    TIM_OC3PreloadConfig(TIM1, TIM_OCPreload_Enable); 	//CH3 Ô¤×°ÔØÊ¹ÄÜ
+    TIM_SetAutoreload(TIM1, 7200); // è®¾ç½®å®šæ—¶å™¨1é‡è£…è½½å€¼
 
-   TIM_OC4Init(TIM1, &TIM_OCInitStructure); 			//¢Û³õÊ¼»¯ÍâÉè TIMx
-    TIM_OC4PreloadConfig(TIM1, TIM_OCPreload_Enable); 	//CH4 Ô¤×°ÔØÊ¹ÄÜ
+    TIM_SetCompare3(TIM1, 1000);
+    TIM_SetCompare4(TIM1, 1000);
 
-    TIM_SetAutoreload(TIM1, 7200);//ÉèÖÃ¶¨Ê±Æ÷1ÖØ×°ÔØÖµ
+    TIM_ITConfig(TIM1, TIM_IT_Update, ENABLE); // ä½¿èƒ½çš„TIM1æ›´æ–°ä¸­æ–­
 
-    TIM_SetCompare3(TIM1,1000);
-    TIM_SetCompare4(TIM1,1000);
+    TIM_Cmd(TIM1, ENABLE); // ä½¿èƒ½TIM1
 
-    TIM_ITConfig(TIM1,TIM_IT_Update,ENABLE); //Ê¹ÄÜµÄTIM1¸üĞÂÖĞ¶Ï
-
-
-    TIM_Cmd(TIM1, ENABLE);  //Ê¹ÄÜTIM1
-
-    TIM_CtrlPWMOutputs(TIM1,ENABLE); //¢İPWMÊä³öÊ¹ÄÜ
-    //return;
+    TIM_CtrlPWMOutputs(TIM1, ENABLE); // â‘¤PWMè¾“å‡ºä½¿èƒ½
+    // return;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

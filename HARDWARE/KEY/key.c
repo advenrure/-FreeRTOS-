@@ -1,56 +1,56 @@
- 
+
 #include "stm32f10x.h"
 #include "key.h"
 #include "delay.h"
-unsigned int k;						    
-void KEY_Init(void)  //³õÊ¼»¯
+unsigned int k;
+void KEY_Init(void) // åˆå§‹åŒ–
 {
- 	GPIO_InitTypeDef GPIO_InitStructure;
- 
- 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC|RCC_APB2Periph_GPIOA,ENABLE);//Ê±ÖÓÊ¹ÄÜ 
-	GPIO_InitStructure.GPIO_Pin  = GPIO_Pin_8|GPIO_Pin_9;//KEY0,KEY1
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;//ÊäÈëÉÏÀ­Ä£Ê½(²»°´°´¼üÊ± É¨ÃèµÄÊÇ¸ßµçÆ½)
- 	GPIO_Init(GPIOC, &GPIO_InitStructure);
-	
+	GPIO_InitTypeDef GPIO_InitStructure;
 
-	GPIO_InitStructure.GPIO_Pin  = GPIO_Pin_0;//KEY0,KEY1
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPD;//ÊäÈëÉÏÀ­Ä£Ê½(²»°´°´¼üÊ± É¨ÃèµÄÊÇ¸ßµçÆ½)
- 	GPIO_Init(GPIOA, &GPIO_InitStructure);
- 
- 
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC | RCC_APB2Periph_GPIOA, ENABLE); // æ—¶é’Ÿä½¿èƒ½
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8 | GPIO_Pin_9;						 // KEY0,KEY1
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;								 // è¾“å…¥ä¸Šæ‹‰æ¨¡å¼(ä¸æŒ‰æŒ‰é”®æ—¶ æ‰«æçš„æ˜¯é«˜ç”µå¹³)
+	GPIO_Init(GPIOC, &GPIO_InitStructure);
+
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;	  // KEY0,KEY1
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPD; // è¾“å…¥ä¸Šæ‹‰æ¨¡å¼(ä¸æŒ‰æŒ‰é”®æ—¶ æ‰«æçš„æ˜¯é«˜ç”µå¹³)
+	GPIO_Init(GPIOA, &GPIO_InitStructure);
 }
-//u8 c=0;
-//°´¼üÉ¨Ãèº¯Êý,ÓÐÁ½ÖÖÄ£Ê½(1.Ö§³ÖÁ¬Ðø°´(°´×¡°´¼ü²»ËÉ¿ª) 2.²»Ö§³ÖÁ¬Ðø°´)
-u8 KEY_Scan(u8 mode)//mode Ä£Ê½Ñ¡Ôñ:1ÎªÖ§³ÖÁ¬Ðø°´ 0Îª²»Ö§³ÖÁ¬Ðø°´
-{	
-	static u8 key_up=1;
-	if(mode)key_up=1;	  
-	if(key_up&&(KEY1==0|| KEY2==0||WK_UP==1))
+// u8 c=0;
+// æŒ‰é”®æ‰«æå‡½æ•°,æœ‰ä¸¤ç§æ¨¡å¼(1.æ”¯æŒè¿žç»­æŒ‰(æŒ‰ä½æŒ‰é”®ä¸æ¾å¼€) 2.ä¸æ”¯æŒè¿žç»­æŒ‰)
+u8 KEY_Scan(u8 mode) // mode æ¨¡å¼é€‰æ‹©:1ä¸ºæ”¯æŒè¿žç»­æŒ‰ 0ä¸ºä¸æ”¯æŒè¿žç»­æŒ‰
+{
+	static u8 key_up = 1;
+	if (mode)
+		key_up = 1;
+	if (key_up && (KEY1 == 0 || KEY2 == 0 || WK_UP == 1))
 	{
-		key_up=0;
-		delay_xms(10);//ÑÓÊ±º¯ÊýÏû¶¶
-		if(KEY1==0)return KEY1_PRES;
-		else if(KEY2==0)return KEY2_PRES;
-		else if(WK_UP==1)
-	
-		return WKUP_PRES;
+		key_up = 0;
+		delay_xms(10); // å»¶æ—¶å‡½æ•°æ¶ˆæŠ–
+		if (KEY1 == 0)
+			return KEY1_PRES;
+		else if (KEY2 == 0)
+			return KEY2_PRES;
+		else if (WK_UP == 1)
 
-	}else if(WK_UP==0&&KEY1==1&&KEY2==1)key_up=1; 	    
- 	return 0;
+			return WKUP_PRES;
+	}
+	else if (WK_UP == 0 && KEY1 == 1 && KEY2 == 1)
+		key_up = 1;
+	return 0;
 }
 
 void key_sta_chage(void)
 {
-  if(KEY1==0)
+	if (KEY1 == 0)
 	{
 		delay_xms(5);
-		if(KEY1==0)
+		if (KEY1 == 0)
 		{
 			k++;
 			delay_xms(5);
-			if(k>2)
-			k=1;
+			if (k > 2)
+				k = 1;
 		}
 	}
 }
-

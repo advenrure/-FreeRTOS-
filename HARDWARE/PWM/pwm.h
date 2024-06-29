@@ -6,11 +6,11 @@
 void TIM1_PWM_Init(void);
 
 
-void PWM_RCC(void);                  //й╠жсеДжц   
-void PWM_GPIO(void);                 //╧э╫ееДжц
-void PWM_TIM3_Configuration(void);   //у╪©у╠хй╠жс©ьжф
-void TIM3_NVIC_Configuration(void);  //сеох╪╤
-void PWM_Init(void);                 //ЁУй╪╩╞ 
+void PWM_RCC(void);                  //Ф≈╤И▓÷И┘█Г╫╝   
+void PWM_GPIO(void);                 //Г╝║Х└ И┘█Г╫╝
+void PWM_TIM3_Configuration(void);   //Е█═Г╘╨Ф╞■Ф≈╤И▓÷Ф▌╖Е┬╤
+void TIM3_NVIC_Configuration(void);  //Д╪≤Е┘┬Г╨╖
+void PWM_Init(void);                 //Е┬²Е╖▀Е▄√ 
 
 
 

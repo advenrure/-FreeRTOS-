@@ -2,117 +2,111 @@
 #include "usart2.h"
 #include "motor.h"
 
-u8 front_flag=0;      //Ç°½øÃüÁî
-u8 back_flag=0;       //ºóÍËÃüÁî
-u8 turn_left_flag=0;  //×ó×ªÃüÁî
-u8 turn_right_flag=0; //ÓÒ×ªÃüÁî
-u8 stop_flag=0;       //Í£Ö¹ÃüÁî
-u8 voice_flag=0;      //ÒôÆµ²¥·ÅÃüÁî
-int turnmentleft=0;
-int turnmentright=0;
+u8 front_flag = 0;		// å‰è¿›å‘½ä»¤
+u8 back_flag = 0;		// åŽé€€å‘½ä»¤
+u8 turn_left_flag = 0;	// å·¦è½¬å‘½ä»¤
+u8 turn_right_flag = 0; // å³è½¬å‘½ä»¤
+u8 stop_flag = 0;		// åœæ­¢å‘½ä»¤
+u8 voice_flag = 0;		// éŸ³é¢‘æ’­æ”¾å‘½ä»¤
+int turnmentleft = 0;
+int turnmentright = 0;
 
-//*******Êý¾Ý·ÖÎö*************************************
+//*******æ•°æ®åˆ†æž*************************************
 void MSG_Analyze_BT(void)
 {
 
-	//******Í£³µ**********
-	if(WF_Data1==0x01)
+	//******åœè½¦**********
+	if (WF_Data1 == 0x01)
 	{
-		WF_Data1=0;
-		stop_flag=1;	
-		//USART3_Count=0;
+		WF_Data1 = 0;
+		stop_flag = 1;
+		// USART3_Count=0;
 	}
-	//******Ç°½ø*********
-	if(WF_Data1==0x02)
+	//******å‰è¿›*********
+	if (WF_Data1 == 0x02)
 	{
-		WF_Data1=0;
-		front_flag=1;
-		
-		//USART3_Count=0;
-	}
-	//******ºóÍË*******
-	if(WF_Data1==0x03)
-	{
-		WF_Data1=0;
-		back_flag=1;
-		//USART3_Count=0;
-	}
-	//******×ó×ª*********
-	if(WF_Data1==0x04)
-	{
-		WF_Data1=0;
-		turn_left_flag=1;
-		//USART3_Count=0;
-	}
-	//*****ÓÒ×ª********
-	if(WF_Data1==0x05)
-	{
-		WF_Data1=0;
-		turn_right_flag=1;
-		//USART3_Count=0;
-	}
+		WF_Data1 = 0;
+		front_flag = 1;
 
+		// USART3_Count=0;
+	}
+	//******åŽé€€*******
+	if (WF_Data1 == 0x03)
+	{
+		WF_Data1 = 0;
+		back_flag = 1;
+		// USART3_Count=0;
+	}
+	//******å·¦è½¬*********
+	if (WF_Data1 == 0x04)
+	{
+		WF_Data1 = 0;
+		turn_left_flag = 1;
+		// USART3_Count=0;
+	}
+	//*****å³è½¬********
+	if (WF_Data1 == 0x05)
+	{
+		WF_Data1 = 0;
+		turn_right_flag = 1;
+		// USART3_Count=0;
+	}
 }
-//*********UI½»»¥*********************************
+//*********UIäº¤äº’*********************************
 void UI(void)
 {
-	 MSG_Analyze_BT();			//Êý¾Ý½âÂë
-  //*****Í£³µ************
-	if(stop_flag==1)
+	MSG_Analyze_BT(); // æ•°æ®è§£ç 
+	//*****åœè½¦************
+	if (stop_flag == 1)
 	{
-	  stop_flag=0;
+		stop_flag = 0;
 		GPIO_ResetBits(GPIOA, GPIO_Pin_8);
-		turnment=0;
-    zhuan_Kp=0;   //ÆÚÍûÐ¡³µ×ªÏò£¬Õý·´À¡
-    zhuan_Kd=0;
-		Car_zero_offset=0;
+		turnment = 0;
+		zhuan_Kp = 0; // æœŸæœ›å°è½¦è½¬å‘ï¼Œæ­£åé¦ˆ
+		zhuan_Kd = 0;
+		Car_zero_offset = 0;
 		return;
 	}
-  //****Ç°½ø************
-	if(front_flag==1)
+	//****å‰è¿›************
+	if (front_flag == 1)
 	{
-	  front_flag=0;
+		front_flag = 0;
 		GPIO_SetBits(GPIOA, GPIO_Pin_8);
-		Car_zero_offset=Car_zero_offset+1.6;
-		turnment=0;
-    zhuan_Kp=1;   //ÆÚÍûÐ¡³µ×ªÏò£¬Õý·´À¡
-    zhuan_Kd=0;
+		Car_zero_offset = Car_zero_offset + 1.6;
+		turnment = 0;
+		zhuan_Kp = 1; // æœŸæœ›å°è½¦è½¬å‘ï¼Œæ­£åé¦ˆ
+		zhuan_Kd = 0;
 		return;
 	}
-  //****ºóÍË**********
-	if(back_flag==1)
+	//****åŽé€€**********
+	if (back_flag == 1)
 	{
-	  back_flag=0;
+		back_flag = 0;
 		GPIO_ResetBits(GPIOA, GPIO_Pin_8);
-		Car_zero_offset=Car_zero_offset-1.67;;
-		turnment=0;
+		Car_zero_offset = Car_zero_offset - 1.67;
+		;
+		turnment = 0;
 
-    zhuan_Kp=1;   //ÆÚÍûÐ¡³µ×ªÏò£¬Õý·´À¡
-    zhuan_Kd=0;
+		zhuan_Kp = 1; // æœŸæœ›å°è½¦è½¬å‘ï¼Œæ­£åé¦ˆ
+		zhuan_Kd = 0;
 		return;
 	}
-  //****×ó×ª*********
-	if(turn_left_flag==1)
+	//****å·¦è½¬*********
+	if (turn_left_flag == 1)
 	{
-	  turn_left_flag=0;
-    turnment=turnmentleft-400;
-		zhuan_Kp=1;
-		zhuan_Kd=0;
+		turn_left_flag = 0;
+		turnment = turnmentleft - 400;
+		zhuan_Kp = 1;
+		zhuan_Kd = 0;
 		return;
 	}
-  //***ÓÒ×ª*********
-	if(turn_right_flag==1)
+	//***å³è½¬*********
+	if (turn_right_flag == 1)
 	{
-	  turn_right_flag=0;
-   turnment=turnmentright+400;
-		zhuan_Kp=1;
-		zhuan_Kd=0;
+		turn_right_flag = 0;
+		turnment = turnmentright + 400;
+		zhuan_Kp = 1;
+		zhuan_Kd = 0;
 		return;
 	}
-
 }
-	
-
-	
-
-

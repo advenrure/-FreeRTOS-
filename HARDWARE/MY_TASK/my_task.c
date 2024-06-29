@@ -19,17 +19,17 @@
 #include "lcd.h"
 #include "usart.h"
 
-//********************ESP8266Ïà¹Ø******************************
+//********************ESP8266ç›¸å…³******************************
 #include "usart2.h"
 #include "esp8266.h"
-//*********************ESP8266Ïà¹Ø******************************
+//*********************ESP8266ç›¸å…³******************************
 
-//********************MPU6050ÍÓÂİÒÇÏà¹Ø******************************
+//********************MPU6050é™€èºä»ªç›¸å…³******************************
 #include "inv_mpu.h"
 #include "inv_mpu_dmp_motion_driver.h"
 #include "mpu6050.h"
 
-//********************MPU6050ÍÓÂİÒÇÏà¹Ø******************************
+//********************MPU6050é™€èºä»ªç›¸å…³******************************
 
 #include "encoder.h"
 #include "pwm.h"
@@ -40,361 +40,307 @@
 
 #include "remote_ctrl.h"
 
-//****²éÑ¯ÈÎÎñ×´Ì¬****************
-char task_buff[500];         //´æ´¢±í¸ñĞÅÏ¢
-char task_time_buff[500];    //´æ´¢±í¸ñĞÅÏ¢
-//******¶¨ÒåÈÎÎñ¾ä±ú***************
-TaskHandle_t StartTask_Handler;   //¿ªÊ¼ÈÎÎñ  
-TaskHandle_t LEDTask_Handler;     //LEDÈÎÎñ
-TaskHandle_t UITask_Handler;      //UIÈÎÎñ
-TaskHandle_t SPEEDTask_Handler;   //²âËÙÈÎÎñ
-TaskHandle_t MOTOTask_Handler;    //µç»úÈÎÎñ
-TaskHandle_t APITask_Handler;     //ÈÎÎñÏà¹ØAPIÈÎÎñ
-TaskHandle_t APITIMETask_Handler; //ÈÎÎñ¼ÆÊ±Ïà¹ØAPIÈÎÎñ
-TaskHandle_t USART2Task_Handler;     //´®¿Ú¶şÈÎÎñ
-TaskHandle_t LCDTask_Handler;     //LCDÈÎÎñ
-//¶şÖµĞÅºÅÁ¿¾ä±ú
-SemaphoreHandle_t BinarySemaphore;	//¶şÖµĞÅºÅÁ¿¾ä±ú
+//****æŸ¥è¯¢ä»»åŠ¡çŠ¶æ€****************
+char task_buff[500];	  // å­˜å‚¨è¡¨æ ¼ä¿¡æ¯
+char task_time_buff[500]; // å­˜å‚¨è¡¨æ ¼ä¿¡æ¯
+//******å®šä¹‰ä»»åŠ¡å¥æŸ„***************
+TaskHandle_t StartTask_Handler;	  // å¼€å§‹ä»»åŠ¡
+TaskHandle_t LEDTask_Handler;	  // LEDä»»åŠ¡
+TaskHandle_t UITask_Handler;	  // UIä»»åŠ¡
+TaskHandle_t SPEEDTask_Handler;	  // æµ‹é€Ÿä»»åŠ¡
+TaskHandle_t MOTOTask_Handler;	  // ç”µæœºä»»åŠ¡
+TaskHandle_t APITask_Handler;	  // ä»»åŠ¡ç›¸å…³APIä»»åŠ¡
+TaskHandle_t APITIMETask_Handler; // ä»»åŠ¡è®¡æ—¶ç›¸å…³APIä»»åŠ¡
+TaskHandle_t USART2Task_Handler;  // ä¸²å£äºŒä»»åŠ¡
+TaskHandle_t LCDTask_Handler;	  // LCDä»»åŠ¡
+// äºŒå€¼ä¿¡å·é‡å¥æŸ„
+SemaphoreHandle_t BinarySemaphore; // äºŒå€¼ä¿¡å·é‡å¥æŸ„
 
 //******************************************
-//º¯ÊıÃû×Ö£º¿ªÊ¼ÈÎÎñ³õÊ¼»¯
-//º¯Êı¹¦ÄÜ£º³õÊ¼»¯²Ù×÷ÏµÍ³µÄµÚÒ»¸öÈÎÎñº¯Êı£¬ÓÃÓÚ³õÊ¼»¯ÆäËûÈÎÎñ
+// å‡½æ•°åå­—ï¼šå¼€å§‹ä»»åŠ¡åˆå§‹åŒ–
+// å‡½æ•°åŠŸèƒ½ï¼šåˆå§‹åŒ–æ“ä½œç³»ç»Ÿçš„ç¬¬ä¸€ä¸ªä»»åŠ¡å‡½æ•°ï¼Œç”¨äºåˆå§‹åŒ–å…¶ä»–ä»»åŠ¡
 //******************************************
 void FreeRTOS_Task_Start(void)
 {
-  xTaskCreate(
-							(TaskFunction_t )start_task,            //ÈÎÎñº¯Êı ÒªºÍºóÃæ¶¨ÒåµÄº¯ÊıµÄÃû×ÖÒ»Ñù
-							(const char*    )"start_task",          //ÈÎÎñÃû³Æ ºÍº¯ÊıÃû×ÖÒ»Ñù¾ÍĞĞ
-							(uint16_t       )START_STK_SIZE,        //ÈÎÎñ¶ÑÕ»´óĞ¡
-							(void*          )NULL,                  //´«µİ¸øÈÎÎñº¯ÊıµÄ²ÎÊı
-							(UBaseType_t    )START_TASK_PRIO,       //ÈÎÎñÓÅÏÈ¼¶
-							(TaskHandle_t*  )&StartTask_Handler     //ÈÎÎñ¾ä±úºÍ×Ô¼º¶¨ÒåµÄ¾ä±úÃû×ÖÒ»Ñù
-				     );                
-   vTaskStartScheduler();          //¿ªÆôÈÎÎñµ÷¶È ´ËÊ±Ö»ÓĞ¿ªÊ¼ÈÎÎñ£¬Ö»»áÖ´ĞĞÕâ1¸öÈÎÎñ
-}	
+	xTaskCreate(
+		(TaskFunction_t)start_task,		   // ä»»åŠ¡å‡½æ•° è¦å’Œåé¢å®šä¹‰çš„å‡½æ•°çš„åå­—ä¸€æ ·
+		(const char *)"start_task",		   // ä»»åŠ¡åç§° å’Œå‡½æ•°åå­—ä¸€æ ·å°±è¡Œ
+		(uint16_t)START_STK_SIZE,		   // ä»»åŠ¡å †æ ˆå¤§å°
+		(void *)NULL,					   // ä¼ é€’ç»™ä»»åŠ¡å‡½æ•°çš„å‚æ•°
+		(UBaseType_t)START_TASK_PRIO,	   // ä»»åŠ¡ä¼˜å…ˆçº§
+		(TaskHandle_t *)&StartTask_Handler // ä»»åŠ¡å¥æŸ„å’Œè‡ªå·±å®šä¹‰çš„å¥æŸ„åå­—ä¸€æ ·
+	);
+	vTaskStartScheduler(); // å¼€å¯ä»»åŠ¡è°ƒåº¦ æ­¤æ—¶åªæœ‰å¼€å§‹ä»»åŠ¡ï¼Œåªä¼šæ‰§è¡Œè¿™1ä¸ªä»»åŠ¡
+}
 //******************************************
-//º¯ÊıÃû×Ö£º¿ªÊ¼ÈÎÎñ
-//º¯Êı¹¦ÄÜ£ºÓÃÓÚ³õÊ¼»¯ÆäËûÈÎÎñ
+// å‡½æ•°åå­—ï¼šå¼€å§‹ä»»åŠ¡
+// å‡½æ•°åŠŸèƒ½ï¼šç”¨äºåˆå§‹åŒ–å…¶ä»–ä»»åŠ¡
 //******************************************
 void start_task(void *pvParameters)
 {
-    taskENTER_CRITICAL();           //½øÈëÁÙ½çÇø ÁÙ½çÇøÆÁ±ÎÁËËùÓĞÖĞ¶Ï£¬ÕâÀïµÄ²Ù×÷²»»á±»´ò¶Ï·ñÔòÔÚ´´½¨µÄ¹ı³ÌÖĞ¾Í»á¿ªÊ¼Ö´ĞĞÈÎÎñÁË
-   //´´½¨¶şÖµĞÅºÅÁ¿
-	  BinarySemaphore=xSemaphoreCreateBinary();	
-	 xSemaphoreTake(BinarySemaphore, 0); // ÇåÁãĞÅºÅÁ¿
-	//´´½¨LEDÈÎÎñ
-    xTaskCreate(
-								(TaskFunction_t )led_task,     	
-								(const char*    )"led_task",   	
-								(uint16_t       )LED_STK_SIZE, 
-								(void*          )NULL,				
-								(UBaseType_t    )LED_TASK_PRIO,	
-								(TaskHandle_t*  )&LEDTask_Handler
-							 );   
-    //´´½¨UIÈÎÎñ
-    xTaskCreate(
-								(TaskFunction_t )ui_task,     
-								(const char*    )"ui_task",   
-								(uint16_t       )UI_STK_SIZE, 
-								(void*          )NULL,
-								(UBaseType_t    )UI_TASK_PRIO,
-								(TaskHandle_t*  )&UITask_Handler
-							 );
-    //´´½¨SPEEDÈÎÎñ
-    xTaskCreate(
-								(TaskFunction_t )speed_task,     
-								(const char*    )"speed_task",   
-								(uint16_t       )SPEED_STK_SIZE, 
-								(void*          )NULL,
-								(UBaseType_t    )SPEED_TASK_PRIO,
-								(TaskHandle_t*  )&SPEEDTask_Handler
-							 );  	 																
-    //´´½¨µç»úÈÎÎñ
-    xTaskCreate(
-								(TaskFunction_t )moto_task,     
-								(const char*    )"moto_task",   
-								(uint16_t       )MOTO_STK_SIZE, 
-								(void*          )NULL,
-								(UBaseType_t    )MOTO_TASK_PRIO,
-								(TaskHandle_t*  )&MOTOTask_Handler
-							 );
-    //´´½¨wifi¿ØÖÆÈÎÎñ
-    xTaskCreate(
-								(TaskFunction_t )usart2_task,
-								(const char*    )"usart2_task",
-								(uint16_t       )USART2_STK_SIZE, 
-								(void*          )NULL,
-								(UBaseType_t    )USART2_TASK_PRIO,
-								(TaskHandle_t*  )&USART2Task_Handler
-							 ); 
-    //´´½¨LCDÏÔÊ¾ÈÎÎñ
-    xTaskCreate(
-								(TaskFunction_t )lcd_task,
-								(const char*    )"lcd_task",
-								(uint16_t       )LCD_STK_SIZE, 
-								(void*          )NULL,
-								(UBaseType_t    )LCD_TASK_PRIO,
-								(TaskHandle_t*  )&LCDTask_Handler
-							 ); 								
-   //API²âÊÔÈÎÎñ
-    xTaskCreate(
-								(TaskFunction_t )api_task,     
-								(const char*    )"api_task",   
-								(uint16_t       )API_STK_SIZE, 
-								(void*          )NULL,
-								(UBaseType_t    )API_TASK_PRIO,
-								(TaskHandle_t*  )&APITask_Handler
-							 );  	
+	taskENTER_CRITICAL(); // è¿›å…¥ä¸´ç•ŒåŒº ä¸´ç•ŒåŒºå±è”½äº†æ‰€æœ‰ä¸­æ–­ï¼Œè¿™é‡Œçš„æ“ä½œä¸ä¼šè¢«æ‰“æ–­å¦åˆ™åœ¨åˆ›å»ºçš„è¿‡ç¨‹ä¸­å°±ä¼šå¼€å§‹æ‰§è¡Œä»»åŠ¡äº†
+	// åˆ›å»ºäºŒå€¼ä¿¡å·é‡
+	BinarySemaphore = xSemaphoreCreateBinary();
+	xSemaphoreTake(BinarySemaphore, 0); // æ¸…é›¶ä¿¡å·é‡
+										// åˆ›å»ºLEDä»»åŠ¡
+	xTaskCreate(
+		(TaskFunction_t)led_task,
+		(const char *)"led_task",
+		(uint16_t)LED_STK_SIZE,
+		(void *)NULL,
+		(UBaseType_t)LED_TASK_PRIO,
+		(TaskHandle_t *)&LEDTask_Handler);
+	// åˆ›å»ºUIä»»åŠ¡
+	xTaskCreate(
+		(TaskFunction_t)ui_task,
+		(const char *)"ui_task",
+		(uint16_t)UI_STK_SIZE,
+		(void *)NULL,
+		(UBaseType_t)UI_TASK_PRIO,
+		(TaskHandle_t *)&UITask_Handler);
+	// åˆ›å»ºSPEEDä»»åŠ¡
+	xTaskCreate(
+		(TaskFunction_t)speed_task,
+		(const char *)"speed_task",
+		(uint16_t)SPEED_STK_SIZE,
+		(void *)NULL,
+		(UBaseType_t)SPEED_TASK_PRIO,
+		(TaskHandle_t *)&SPEEDTask_Handler);
+	// åˆ›å»ºç”µæœºä»»åŠ¡
+	xTaskCreate(
+		(TaskFunction_t)moto_task,
+		(const char *)"moto_task",
+		(uint16_t)MOTO_STK_SIZE,
+		(void *)NULL,
+		(UBaseType_t)MOTO_TASK_PRIO,
+		(TaskHandle_t *)&MOTOTask_Handler);
+	// åˆ›å»ºwifiæ§åˆ¶ä»»åŠ¡
+	xTaskCreate(
+		(TaskFunction_t)usart2_task,
+		(const char *)"usart2_task",
+		(uint16_t)USART2_STK_SIZE,
+		(void *)NULL,
+		(UBaseType_t)USART2_TASK_PRIO,
+		(TaskHandle_t *)&USART2Task_Handler);
+	// åˆ›å»ºLCDæ˜¾ç¤ºä»»åŠ¡
+	xTaskCreate(
+		(TaskFunction_t)lcd_task,
+		(const char *)"lcd_task",
+		(uint16_t)LCD_STK_SIZE,
+		(void *)NULL,
+		(UBaseType_t)LCD_TASK_PRIO,
+		(TaskHandle_t *)&LCDTask_Handler);
+	// APIæµ‹è¯•ä»»åŠ¡
+	xTaskCreate(
+		(TaskFunction_t)api_task,
+		(const char *)"api_task",
+		(uint16_t)API_STK_SIZE,
+		(void *)NULL,
+		(UBaseType_t)API_TASK_PRIO,
+		(TaskHandle_t *)&APITask_Handler);
 
-   //APIÊ±¼ä²âÊÔÈÎÎñ
-    xTaskCreate(
-								(TaskFunction_t )apitime_task,     
-								(const char*    )"apitime_task",   
-								(uint16_t       )APITIME_STK_SIZE, 
-								(void*          )NULL,
-								(UBaseType_t    )APITIME_TASK_PRIO,
-								(TaskHandle_t*  )&APITIMETask_Handler
-							 );  												
-																	
-		vTaskDelete(StartTask_Handler); //É¾³ı¿ªÊ¼ÈÎÎñ
-    taskEXIT_CRITICAL();            //ÍË³öÁÙ½çÇø
+	// APIæ—¶é—´æµ‹è¯•ä»»åŠ¡
+	xTaskCreate(
+		(TaskFunction_t)apitime_task,
+		(const char *)"apitime_task",
+		(uint16_t)APITIME_STK_SIZE,
+		(void *)NULL,
+		(UBaseType_t)APITIME_TASK_PRIO,
+		(TaskHandle_t *)&APITIMETask_Handler);
+
+	vTaskDelete(StartTask_Handler); // åˆ é™¤å¼€å§‹ä»»åŠ¡
+	taskEXIT_CRITICAL();			// é€€å‡ºä¸´ç•ŒåŒº
 }
 
 //******************************************
-//º¯ÊıÃû×Ö£ºLEDÈÎÎñ
-//º¯Êı¹¦ÄÜ£ºÊµÏÖĞÄÌøµÆ¹¦ÄÜ£¬¼ì²âÏµÍ³ÊÇ·ñÕı³£
+// å‡½æ•°åå­—ï¼šLEDä»»åŠ¡
+// å‡½æ•°åŠŸèƒ½ï¼šå®ç°å¿ƒè·³ç¯åŠŸèƒ½ï¼Œæ£€æµ‹ç³»ç»Ÿæ˜¯å¦æ­£å¸¸
 //******************************************
 void usart2_task(void *pvParameters)
 {
-    while(1)
-    {
-					/* »ñÈ¡ĞÅºÅÁ¿£¬Èç¹ûĞÅºÅÁ¿²»¿ÉÓÃ£¬Ôò×èÈûµÈ´ı */
-		xSemaphoreTake(  BinarySemaphore, portMAX_DELAY );
-//			LCD_Clear(WHITE);
-//			delay_xms(2);
-//			LCD_Clear(BLACK);
-      USART2_WIFI_CTRL();
-			vTaskDelay(1);   	
-    }
-}   
-
-
+	while (1)
+	{
+		/* è·å–ä¿¡å·é‡ï¼Œå¦‚æœä¿¡å·é‡ä¸å¯ç”¨ï¼Œåˆ™é˜»å¡ç­‰å¾… */
+		xSemaphoreTake(BinarySemaphore, portMAX_DELAY);
+		//			LCD_Clear(WHITE);
+		//			delay_xms(2);
+		//			LCD_Clear(BLACK);
+		USART2_WIFI_CTRL();
+		vTaskDelay(1);
+	}
+}
 
 void lcd_task(void *pvParameters)
 {
-     while(1)
-    {
-      	sprintf(pitch_str, "pitch£º%.2f", pitch);
-        sprintf(roll_str, "roll£º%.2f", roll);
-        sprintf(yaw_str, "yaw£º%.2f", yaw);
-        LCD_DrawFont_GBK24(0, 10, BLACK, WHITE, (u8 *)pitch_str);
-        LCD_DrawFont_GBK24(0, 40, BLACK, WHITE, (u8 *)roll_str);
-        LCD_DrawFont_GBK24(0, 70, BLACK, WHITE, (u8 *)yaw_str);
-			vTaskDelay(1);   	
-    }
-
-
-
-
+	while (1)
+	{
+		sprintf(pitch_str, "pitchï¼š%.2f", pitch);
+		sprintf(roll_str, "rollï¼š%.2f", roll);
+		sprintf(yaw_str, "yawï¼š%.2f", yaw);
+		LCD_DrawFont_GBK24(0, 10, BLACK, WHITE, (u8 *)pitch_str);
+		LCD_DrawFont_GBK24(0, 40, BLACK, WHITE, (u8 *)roll_str);
+		LCD_DrawFont_GBK24(0, 70, BLACK, WHITE, (u8 *)yaw_str);
+		vTaskDelay(1);
+	}
 }
 
 //******************************************
-//º¯ÊıÃû×Ö£ºLEDÈÎÎñ
-//º¯Êı¹¦ÄÜ£ºÊµÏÖĞÄÌøµÆ¹¦ÄÜ£¬¼ì²âÏµÍ³ÊÇ·ñÕı³£
+// å‡½æ•°åå­—ï¼šLEDä»»åŠ¡
+// å‡½æ•°åŠŸèƒ½ï¼šå®ç°å¿ƒè·³ç¯åŠŸèƒ½ï¼Œæ£€æµ‹ç³»ç»Ÿæ˜¯å¦æ­£å¸¸
 //******************************************
 void led_task(void *pvParameters)
 {
-    while(1)
-    {
-      //LED0=~LED0;	    //ĞÄÌøµÆ
-			//Feed_dog();   //Î¹¹·
-			//ADC_Check1();
-			vTaskDelay(1);   	
-    }
-}   
-  u8 u=0;
+	while (1)
+	{
+		// LED0=~LED0;	    //å¿ƒè·³ç¯
+		// Feed_dog();   //å–‚ç‹—
+		// ADC_Check1();
+		vTaskDelay(1);
+	}
+}
+u8 u = 0;
 //******************************************
-//º¯ÊıÃû×Ö£ºUIÈÎÎñ
-//º¯Êı¹¦ÄÜ£ºÊµÏÖ²âËÙ1¹¦ÄÜ£¬ÊµÊ±¼ì²âÂÖ×ÓËÙ¶È
+// å‡½æ•°åå­—ï¼šUIä»»åŠ¡
+// å‡½æ•°åŠŸèƒ½ï¼šå®ç°æµ‹é€Ÿ1åŠŸèƒ½ï¼Œå®æ—¶æ£€æµ‹è½®å­é€Ÿåº¦
 //******************************************
 void ui_task(void *pvParameters)
 {
-	 while(1)
-    { 
-			  //LCD_Clear(WHITE);
-			LED0=!LED0;
-			UI();
-     	
+	while (1)
+	{
+		// LCD_Clear(WHITE);
+		LED0 = !LED0;
+		UI();
 
-			vTaskDelay(2); 
-		
-    
-    }
+		vTaskDelay(2);
+	}
 }
 //******************************************
-//º¯ÊıÃû×Ö£ºSPEEDÈÎÎñ
-//º¯Êı¹¦ÄÜ£ºÊµÏÖ²âËÙ¹¦ÄÜ£¬ÊµÊ±¼ì²âÂÖ×ÓËÙ¶È
+// å‡½æ•°åå­—ï¼šSPEEDä»»åŠ¡
+// å‡½æ•°åŠŸèƒ½ï¼šå®ç°æµ‹é€ŸåŠŸèƒ½ï¼Œå®æ—¶æ£€æµ‹è½®å­é€Ÿåº¦
 //******************************************
-u8 time=0;
+u8 time = 0;
 void speed_task(void *pvParameters)
 {
-	while(1)
-   {
-    
-  time++;
-  MPU6050_Data_read();	//»ñÈ¡ÍÓÂİÒÇÊı¾İ	
-	if(time>=5)
+	while (1)
 	{
-		time=0;  
-	  Moto_Speed_Read(1); //¶ÁÈ¡ËÙ¶È
-	  Moto_Speed_Read(2);	//¶ÁÈ¡ËÙ¶È
-	  
+
+		time++;
+		MPU6050_Data_read(); // è·å–é™€èºä»ªæ•°æ®
+		if (time >= 5)
+		{
+			time = 0;
+			Moto_Speed_Read(1); // è¯»å–é€Ÿåº¦
+			Moto_Speed_Read(2); // è¯»å–é€Ÿåº¦
+		}
+		Smart_Car_Task(); // å¹³è¡¡è½¦è¿åŠ¨ä»»åŠ¡
+		vTaskDelay(1);
 	}
-  Smart_Car_Task();     //Æ½ºâ³µÔË¶¯ÈÎÎñ	
-		  vTaskDelay(1);   
-    }
-	
-	 
-	
 }
 //******************************************
-//º¯ÊıÃû×Ö£ºMOTOÈÎÎñ
-//º¯Êı¹¦ÄÜ£º
+// å‡½æ•°åå­—ï¼šMOTOä»»åŠ¡
+// å‡½æ•°åŠŸèƒ½ï¼š
 //******************************************
 void moto_task(void *pvParameters)
 {
-    while(1)
-    {    
+	while (1)
+	{
 
-			vTaskDelay(10); 	
-    }
+		vTaskDelay(10);
+	}
 }
 
-
-
-
-
-
-
 //******************************************
-//º¯ÊıÃû×Ö£ºÈÎÎñÏà¹ØAPI
-//º¯Êı¹¦ÄÜ£ºÈÎÎñÏà¹ØAPI²âÊÔ
+// å‡½æ•°åå­—ï¼šä»»åŠ¡ç›¸å…³API
+// å‡½æ•°åŠŸèƒ½ï¼šä»»åŠ¡ç›¸å…³APIæµ‹è¯•
 //******************************************
 void api_task(void *pvParameters)
 {
-////	u8 i=0;
-////	UBaseType_t priority_n=0;   //ÓÅÏÈ¼¶
-////	UBaseType_t task_n=0;       //ÈÎÎñÊıÁ¿
-////	UBaseType_t task_n1=0;      //ÈÎÎñÊıÁ¿
-////	TaskStatus_t *StatusArray=0;//´æ·ÅÈÎÎñ×´Ì¬µÄÄÚ´æ
-////	TaskStatus_t *StatusArray1=0;//´æ·ÅÈÎÎñ×´Ì¬µÄÄÚ´æ
-////	UBaseType_t task_stak_min=0; //ÀúÊ·×îĞ¡ÈÎÎñ¶ÑÕ»Ê£Óà
-////	
-////	
-//	
-////	//********************²éÑ¯ÈÎÎñÓÅÏÈ¼¶*******************************************
-////	priority_n=uxTaskPriorityGet(LED0Task_Handler);  //INCLUDE_uxTaskPriorityGetÖÃ1   ²éÑ¯ÈÎÎñÓÅÏÈ¼¶
-////	printf("»ñÈ¡µÄÈÎÎñÓÅÏÈ¼¶Îª%ld\r\n",priority_n);
-//// 
-////	//********************ÉèÖÃÈÎÎñÓÅÏÈ¼¶*******************************************
-////	vTaskPrioritySet(LED0Task_Handler,8);            //INCLUDE_vTaskPrioritySetÖÃ1 ÉèÖÃÈÎÎñÓÅÏÈ¼¶Îª8
-////  priority_n=uxTaskPriorityGet(LED0Task_Handler);  //INCLUDE_uxTaskPriorityGetÖÃ1   ²éÑ¯ÈÎÎñÓÅÏÈ¼¶
-////	printf("ĞŞ¸ÄºóµÄÈÎÎñÓÅÏÈ¼¶Îª%ld\r\n",priority_n);	
-////	
-//	//********************»ñÈ¡ÈÎÎñÊıÁ¿*********************************************
-//	task_n=uxTaskGetNumberOfTasks();                //»ñÈ¡ÈÎÎñÊıÁ¿  ¸öÈËµÄÈÎÎñÊıÁ¿  ¿ÕÏĞÈÎÎñ  ¶¨Ê±Æ÷ÈÎÎñ  ËùÒÔÊÇ×Ô¶¨ÒåÊıÁ¿+2
-//	printf("ÈÎÎñÊıÁ¿Îª%ld\r\n",task_n);
-////	
-//	//********************»ñÈ¡ËùÓĞµÄÈÎÎñ×´Ì¬***************************************
-//	StatusArray=pvPortMalloc(task_n*sizeof(TaskStatus_t));//ÉêÇëÄÚ´æ
-//	task_n1=uxTaskGetSystemState( StatusArray,task_n , NULL);//configUSE_TRACE_FACILITYÖÃ1
-//	printf("ÈÎÎñÃû		ÈÎÎñÓÅÏÈ¼¶		ÈÎÎñ±àºÅ		ÀúÊ·Ê£Óà×îĞ¡Öµ\r\n");
-//	for(i=0;i<task_n1;i++)
-//	{
-//	  printf("%s		%ld		%ld		%d\r\n",
-//		      StatusArray[i].pcTaskName,     
-//		      StatusArray[i].uxCurrentPriority,
-//		      StatusArray[i].xTaskNumber,
-//		      StatusArray[i].usStackHighWaterMark
-//		      );
-//	}
-//	vPortFree(StatusArray);	//ÊÍ·ÅÄÚ´æ
-//	
-//	//********************»ñÈ¡Ö¸¶¨ÈÎÎñµÄĞÅÏ¢************************************
-//	StatusArray1=pvPortMalloc(sizeof(TaskStatus_t));//ÉêÇëÄÚ´æ
-//	//»ñÈ¡LED0_TaskµÄÈÎÎñĞÅÏ¢
-////	vTaskGetInfo(LED0Task_Handler, 		   //ÈÎÎñ¾ä±ú
-////				       StatusArray1, 		       //ÈÎÎñĞÅÏ¢½á¹¹Ìå
-////				       pdTRUE,			           //ÔÊĞíÍ³¼ÆÈÎÎñ¶ÑÕ»ÀúÊ·×îĞ¡Ê£Óà´óĞ¡
-////			         eInvalid                //º¯Êı×Ô¼º»ñÈ¡ÈÎÎñÔËĞĞ×³Ì¬
-////							);			        
-//	//Í¨¹ı´®¿Ú´òÓ¡³öÖ¸¶¨ÈÎÎñµÄÓĞ¹ØĞÅÏ¢¡£
-//	printf("ÈÎÎñÃû:                %s\r\n",StatusArray1->pcTaskName);
-//	printf("ÈÎÎñ±àºÅ:              %d\r\n",(int)StatusArray1->xTaskNumber);
-//	printf("ÈÎÎñ×³Ì¬:              %d\r\n",StatusArray1->eCurrentState);
-//	printf("ÈÎÎñµ±Ç°ÓÅÏÈ¼¶:        %d\r\n",(int)StatusArray1->uxCurrentPriority);
-//	printf("ÈÎÎñ»ùÓÅÏÈ¼¶:          %d\r\n",(int)StatusArray1->uxBasePriority);
-//	printf("ÈÎÎñ¶ÑÕ»»ùµØÖ·:        %#x\r\n",(int)StatusArray1->pxStackBase);
-//	printf("ÈÎÎñ¶ÑÕ»ÀúÊ·Ê£Óà×îĞ¡Öµ:%d\r\n",StatusArray1->usStackHighWaterMark);
-//	vPortFree(StatusArray1);	//ÊÍ·ÅÄÚ´æ
-//	
-////	//***************»ñÈ¡Ö¸¶¨ÈÎÎñµÄ¶ÑÕ»ÀúÊ·Ê£Óà×îĞ¡Öµ****************************
-////	 task_stak_min=uxTaskGetStackHighWaterMark(LED0Task_Handler);   //INCLUDE_uxTaskGetStackHighWaterMarkÖÃ1
-////	 printf("ÈÎÎñ¶ÑÕ»ÀúÊ·Ê£Óà×îĞ¡Öµ:%ld\r\n",task_stak_min);
-////	 
-//	//***************ÒÔ±í¸ñµÄĞÎÊ½»ñÈ¡ÈÎÎñÖĞµÄĞÅÏ¢****************************
-//	//configUSE_TRACE_FACILITYÖÃ1 configUSE_STATS_FORMATTING_FUNCTIONSÖÃ1
-//	vTaskList(task_buff);       //B×èÈûÌ¬ R¾ÍĞ÷Ì¬ S¹ÒÆğÌ¬ DÉ¾³ıÌ¬
-//	printf("Ãû×Ö           ×´Ì¬   ÓÅÏÈ¼¶   ×îĞ¡Öµ   ±àºÅ\r\n");
-//	printf("%s\r\n",task_buff);	
-	while(1)
+	////	u8 i=0;
+	////	UBaseType_t priority_n=0;   //ä¼˜å…ˆçº§
+	////	UBaseType_t task_n=0;       //ä»»åŠ¡æ•°é‡
+	////	UBaseType_t task_n1=0;      //ä»»åŠ¡æ•°é‡
+	////	TaskStatus_t *StatusArray=0;//å­˜æ”¾ä»»åŠ¡çŠ¶æ€çš„å†…å­˜
+	////	TaskStatus_t *StatusArray1=0;//å­˜æ”¾ä»»åŠ¡çŠ¶æ€çš„å†…å­˜
+	////	UBaseType_t task_stak_min=0; //å†å²æœ€å°ä»»åŠ¡å †æ ˆå‰©ä½™
+	////
+	////
+	//
+	////	//********************æŸ¥è¯¢ä»»åŠ¡ä¼˜å…ˆçº§*******************************************
+	////	priority_n=uxTaskPriorityGet(LED0Task_Handler);  //INCLUDE_uxTaskPriorityGetç½®1   æŸ¥è¯¢ä»»åŠ¡ä¼˜å…ˆçº§
+	////	printf("è·å–çš„ä»»åŠ¡ä¼˜å…ˆçº§ä¸º%ld\r\n",priority_n);
+	////
+	////	//********************è®¾ç½®ä»»åŠ¡ä¼˜å…ˆçº§*******************************************
+	////	vTaskPrioritySet(LED0Task_Handler,8);            //INCLUDE_vTaskPrioritySetç½®1 è®¾ç½®ä»»åŠ¡ä¼˜å…ˆçº§ä¸º8
+	////  priority_n=uxTaskPriorityGet(LED0Task_Handler);  //INCLUDE_uxTaskPriorityGetç½®1   æŸ¥è¯¢ä»»åŠ¡ä¼˜å…ˆçº§
+	////	printf("ä¿®æ”¹åçš„ä»»åŠ¡ä¼˜å…ˆçº§ä¸º%ld\r\n",priority_n);
+	////
+	//	//********************è·å–ä»»åŠ¡æ•°é‡*********************************************
+	//	task_n=uxTaskGetNumberOfTasks();                //è·å–ä»»åŠ¡æ•°é‡  ä¸ªäººçš„ä»»åŠ¡æ•°é‡  ç©ºé—²ä»»åŠ¡  å®šæ—¶å™¨ä»»åŠ¡  æ‰€ä»¥æ˜¯è‡ªå®šä¹‰æ•°é‡+2
+	//	printf("ä»»åŠ¡æ•°é‡ä¸º%ld\r\n",task_n);
+	////
+	//	//********************è·å–æ‰€æœ‰çš„ä»»åŠ¡çŠ¶æ€***************************************
+	//	StatusArray=pvPortMalloc(task_n*sizeof(TaskStatus_t));//ç”³è¯·å†…å­˜
+	//	task_n1=uxTaskGetSystemState( StatusArray,task_n , NULL);//configUSE_TRACE_FACILITYç½®1
+	//	printf("ä»»åŠ¡å		ä»»åŠ¡ä¼˜å…ˆçº§		ä»»åŠ¡ç¼–å·		å†å²å‰©ä½™æœ€å°å€¼\r\n");
+	//	for(i=0;i<task_n1;i++)
+	//	{
+	//	  printf("%s		%ld		%ld		%d\r\n",
+	//		      StatusArray[i].pcTaskName,
+	//		      StatusArray[i].uxCurrentPriority,
+	//		      StatusArray[i].xTaskNumber,
+	//		      StatusArray[i].usStackHighWaterMark
+	//		      );
+	//	}
+	//	vPortFree(StatusArray);	//é‡Šæ”¾å†…å­˜
+	//
+	//	//********************è·å–æŒ‡å®šä»»åŠ¡çš„ä¿¡æ¯************************************
+	//	StatusArray1=pvPortMalloc(sizeof(TaskStatus_t));//ç”³è¯·å†…å­˜
+	//	//è·å–LED0_Taskçš„ä»»åŠ¡ä¿¡æ¯
+	////	vTaskGetInfo(LED0Task_Handler, 		   //ä»»åŠ¡å¥æŸ„
+	////				       StatusArray1, 		       //ä»»åŠ¡ä¿¡æ¯ç»“æ„ä½“
+	////				       pdTRUE,			           //å…è®¸ç»Ÿè®¡ä»»åŠ¡å †æ ˆå†å²æœ€å°å‰©ä½™å¤§å°
+	////			         eInvalid                //å‡½æ•°è‡ªå·±è·å–ä»»åŠ¡è¿è¡Œå£®æ€
+	////							);
+	//	//é€šè¿‡ä¸²å£æ‰“å°å‡ºæŒ‡å®šä»»åŠ¡çš„æœ‰å…³ä¿¡æ¯ã€‚
+	//	printf("ä»»åŠ¡å:                %s\r\n",StatusArray1->pcTaskName);
+	//	printf("ä»»åŠ¡ç¼–å·:              %d\r\n",(int)StatusArray1->xTaskNumber);
+	//	printf("ä»»åŠ¡å£®æ€:              %d\r\n",StatusArray1->eCurrentState);
+	//	printf("ä»»åŠ¡å½“å‰ä¼˜å…ˆçº§:        %d\r\n",(int)StatusArray1->uxCurrentPriority);
+	//	printf("ä»»åŠ¡åŸºä¼˜å…ˆçº§:          %d\r\n",(int)StatusArray1->uxBasePriority);
+	//	printf("ä»»åŠ¡å †æ ˆåŸºåœ°å€:        %#x\r\n",(int)StatusArray1->pxStackBase);
+	//	printf("ä»»åŠ¡å †æ ˆå†å²å‰©ä½™æœ€å°å€¼:%d\r\n",StatusArray1->usStackHighWaterMark);
+	//	vPortFree(StatusArray1);	//é‡Šæ”¾å†…å­˜
+	//
+	////	//***************è·å–æŒ‡å®šä»»åŠ¡çš„å †æ ˆå†å²å‰©ä½™æœ€å°å€¼****************************
+	////	 task_stak_min=uxTaskGetStackHighWaterMark(LED0Task_Handler);   //INCLUDE_uxTaskGetStackHighWaterMarkç½®1
+	////	 printf("ä»»åŠ¡å †æ ˆå†å²å‰©ä½™æœ€å°å€¼:%ld\r\n",task_stak_min);
+	////
+	//	//***************ä»¥è¡¨æ ¼çš„å½¢å¼è·å–ä»»åŠ¡ä¸­çš„ä¿¡æ¯****************************
+	//	//configUSE_TRACE_FACILITYç½®1 configUSE_STATS_FORMATTING_FUNCTIONSç½®1
+	//	vTaskList(task_buff);       //Bé˜»å¡æ€ Rå°±ç»ªæ€ SæŒ‚èµ·æ€ Dåˆ é™¤æ€
+	//	printf("åå­—           çŠ¶æ€   ä¼˜å…ˆçº§   æœ€å°å€¼   ç¼–å·\r\n");
+	//	printf("%s\r\n",task_buff);
+	while (1)
 	{
 
-	  vTaskDelay(10);	   
+		vTaskDelay(10);
 	}
 }
 
-//***********ÒÔ±í¸ñĞÎÊ½ÏÔÊ¾ÈÎÎñµÄÔËĞĞÊ±¼ä*******************************
-//configGENERATE_RUN_TIME_STATSÖÃ1  configUSE_STATS_FORMATTING_FUNCTIONSÖÃ1
-//µ÷ÊÔÓÃ£¬¿ÕÏĞÈÎÎñIDLµÄÕ¼±ÈÔ½¸ßËµÃ÷CPUÑ¹Á¦Ô½Ğ¡£¬ÈÎÎñµÄÕ¼±È¸ßËµÃ÷ÈÎÎñ¸´ÔÓ¶È¸ß£¬¿ÉÒÔ¿¼ÂÇ²ğ·Ö
-//configGENERATE_RUN_TIME_STATSÖÃ1  ĞèÒª°Ñº¯ÊıportCONFIGURE_TIMER_FOR_RUN_TIME_STATS();¶¨Òå£¬Ê±»ù¶¨Ê±Æ÷ÓÃ10-100±¶Ê±¼äÆ¬µÄ¾«¶È£¬ÕâÀïÉèÖÃ10uS
-//portGET_RUN_TIME_COUNTER_VALUE();ÓÃÓÚ»ñÈ¡Ó²¼ş¼ÆÊıÖµ
-//´ËÀı³ÌÊ¹ÓÃtime3½øĞĞ10uSÖĞ¶Ï¼ÆÊ±
+//***********ä»¥è¡¨æ ¼å½¢å¼æ˜¾ç¤ºä»»åŠ¡çš„è¿è¡Œæ—¶é—´*******************************
+// configGENERATE_RUN_TIME_STATSç½®1  configUSE_STATS_FORMATTING_FUNCTIONSç½®1
+// è°ƒè¯•ç”¨ï¼Œç©ºé—²ä»»åŠ¡IDLçš„å æ¯”è¶Šé«˜è¯´æ˜CPUå‹åŠ›è¶Šå°ï¼Œä»»åŠ¡çš„å æ¯”é«˜è¯´æ˜ä»»åŠ¡å¤æ‚åº¦é«˜ï¼Œå¯ä»¥è€ƒè™‘æ‹†åˆ†
+// configGENERATE_RUN_TIME_STATSç½®1  éœ€è¦æŠŠå‡½æ•°portCONFIGURE_TIMER_FOR_RUN_TIME_STATS();å®šä¹‰ï¼Œæ—¶åŸºå®šæ—¶å™¨ç”¨10-100å€æ—¶é—´ç‰‡çš„ç²¾åº¦ï¼Œè¿™é‡Œè®¾ç½®10uS
+// portGET_RUN_TIME_COUNTER_VALUE();ç”¨äºè·å–ç¡¬ä»¶è®¡æ•°å€¼
+// æ­¤ä¾‹ç¨‹ä½¿ç”¨time3è¿›è¡Œ10uSä¸­æ–­è®¡æ—¶
 
 void apitime_task(void *pvParameters)
-{ 
-	while(1)
-	{   
-//		vTaskGetRunTimeStats(task_time_buff);
-//	  printf("Ãû×Ö           Ê±¼ä*10uS        Õ¼±È\r\n");
-//	  printf("%s\r\n",task_time_buff);
-	  vTaskDelay(10);	  
+{
+	while (1)
+	{
+		//		vTaskGetRunTimeStats(task_time_buff);
+		//	  printf("åå­—           æ—¶é—´*10uS        å æ¯”\r\n");
+		//	  printf("%s\r\n",task_time_buff);
+		vTaskDelay(10);
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

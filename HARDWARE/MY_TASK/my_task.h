@@ -1,36 +1,36 @@
 #ifndef __MY_TASK_H
-#define __MY_TASK_H	 
-//#include "pbdata.h"
+#define __MY_TASK_H
+// #include "pbdata.h"
 #include "FreeRTOS.h"
 #include "task.h"
 #include "semphr.h"
-//*******ÈÎÎñÓÅÏÈ¼¶0-31,Ô½´óÔ½ÓÅÏÈ*******************
-#define START_TASK_PRIO		    1        
-#define LED_TASK_PRIO		      2
-#define UI_TASK_PRIO		      4
-#define SPEED_TASK_PRIO		    5
-#define MOTO_TASK_PRIO		    2
-#define USART2_TASK_PRIO      4
-#define LCD_TASK_PRIO         3
-#define API_TASK_PRIO		      2
-#define APITIME_TASK_PRIO     2
+//*******ä»»åŠ¡ä¼˜å…ˆçº§0-31,è¶Šå¤§è¶Šä¼˜å…ˆ*******************
+#define START_TASK_PRIO 1
+#define LED_TASK_PRIO 2
+#define UI_TASK_PRIO 4
+#define SPEED_TASK_PRIO 5
+#define MOTO_TASK_PRIO 2
+#define USART2_TASK_PRIO 4
+#define LCD_TASK_PRIO 3
+#define API_TASK_PRIO 2
+#define APITIME_TASK_PRIO 2
 
-//*******ÈÎÎñ¶ÑÕ»´óĞ¡	µ¥Î»×Ö *4µÄµ¥Î»Îª×Ö½Ú 1024×Ö½ÚÎª1KB**********
-#define START_STK_SIZE 		100     
-#define LED_STK_SIZE 		  500  
-#define UI_STK_SIZE       500  
-#define SPEED_STK_SIZE    1000 
-#define MOTO_STK_SIZE 		500
+//*******ä»»åŠ¡å †æ ˆå¤§å°	å•ä½å­— *4çš„å•ä½ä¸ºå­—èŠ‚ 1024å­—èŠ‚ä¸º1KB**********
+#define START_STK_SIZE 100
+#define LED_STK_SIZE 500
+#define UI_STK_SIZE 500
+#define SPEED_STK_SIZE 1000
+#define MOTO_STK_SIZE 500
 #define USART2_STK_SIZE 500
 #define LCD_STK_SIZE 500
-#define API_STK_SIZE 		  50 
-#define APITIME_STK_SIZE 	50 
+#define API_STK_SIZE 50
+#define APITIME_STK_SIZE 50
 
-//****²éÑ¯ÈÎÎñ×´Ì¬****************
-extern char task_buff[500];    //´æ´¢±í¸ñĞÅÏ¢
+//****æŸ¥è¯¢ä»»åŠ¡çŠ¶æ€****************
+extern char task_buff[500]; // å­˜å‚¨è¡¨æ ¼ä¿¡æ¯
 extern char task_time_buff[500];
-//********ÈÎÎñ¾ä±ú*******************
-extern TaskHandle_t StartTask_Handler;     
+//********ä»»åŠ¡å¥æŸ„*******************
+extern TaskHandle_t StartTask_Handler;
 extern TaskHandle_t LEDTask_Handler;
 extern TaskHandle_t UITask_Handler;
 extern TaskHandle_t SPEEDTask_Handler;
@@ -38,16 +38,16 @@ extern TaskHandle_t MOTOTask_Handler;
 extern TaskHandle_t APITask_Handler;
 extern TaskHandle_t APITIMETask_Handler;
 
-extern SemaphoreHandle_t BinarySemaphore;	//¶şÖµĞÅºÅÁ¿¾ä±ú
-//********ÈÎÎñº¯Êı*******************
+extern SemaphoreHandle_t BinarySemaphore; // äºŒå€¼ä¿¡å·é‡å¥æŸ„
+//********ä»»åŠ¡å‡½æ•°*******************
 void FreeRTOS_Task_Start(void);
 void start_task(void *pvParameters);
 void led_task(void *pvParameters);
-void ui_task(void *pvParameters);	
-void speed_task(void *pvParameters);	
+void ui_task(void *pvParameters);
+void speed_task(void *pvParameters);
 void moto_task(void *pvParameters);
-void usart2_task(void *pvParameters);	
-void lcd_task(void *pvParameters);	
+void usart2_task(void *pvParameters);
+void lcd_task(void *pvParameters);
 void api_task(void *pvParameters);
 void apitime_task(void *pvParameters);
 #endif

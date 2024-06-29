@@ -1,47 +1,46 @@
 #ifndef _pid_H
 #define _pid_H
 #include "stm32f10x.h"
-//#include "pbdata.h"
-//***************PID²ÎÊıÉèÖÃ********************************************
-//¶¨ÒåÎ»ÖÃ»·PID²ÎÊıÏà¹Øºê 
-#define  L_KP     2.5f             // P²ÎÊı 
-#define  L_KI      0.0f             // I²ÎÊı 
-#define  L_KD      0.2f             // D²ÎÊı 
+// #include "pbdata.h"
+//***************PIDå‚æ•°è®¾ç½®********************************************
+// å®šä¹‰ä½ç½®ç¯PIDå‚æ•°ç›¸å…³å®
+#define L_KP 2.5f // På‚æ•°
+#define L_KI 0.0f // Iå‚æ•°
+#define L_KD 0.2f // Då‚æ•°
 
-//¶¨ÒåËÙ¶È»·PID²ÎÊıÏà¹Øºê 
-#define  S_KP      0.03f              // P²ÎÊı 
-#define  S_KI      0.02f             // I²ÎÊı 
-#define  S_KD      0.01f             // D²ÎÊı 
+// å®šä¹‰é€Ÿåº¦ç¯PIDå‚æ•°ç›¸å…³å®
+#define S_KP 0.03f // På‚æ•°
+#define S_KI 0.02f // Iå‚æ•°
+#define S_KD 0.01f // Då‚æ•°
 
-//¶¨ÒåµçÁ÷»·PID²ÎÊıÏà¹Øºê 
-#define  C_KP      8.00f             // P²ÎÊı 
-#define  C_KI      4.00f             // I²ÎÊı 
-#define  C_KD      1.00f             // D²ÎÊı 
-#define  SMAPLSE_PID_SPEED  50       // ²ÉÑùÖÜÆÚ µ¥Î»ms 
-//PID½á¹¹Ìå
+// å®šä¹‰ç”µæµç¯PIDå‚æ•°ç›¸å…³å®
+#define C_KP 8.00f           // På‚æ•°
+#define C_KI 4.00f           // Iå‚æ•°
+#define C_KD 1.00f           // Då‚æ•°
+#define SMAPLSE_PID_SPEED 50 // é‡‡æ ·å‘¨æœŸ å•ä½ms
+// PIDç»“æ„ä½“
 typedef struct
 {
-    __IO float  SetPoint;            //ÓÃ»§Ä¿±êÖµ 
-    __IO float  ActualValue;         //PID¼ÆËãºóÊä³öÖµ 
-    __IO float  SumError;            //Îó²îÀÛ¼Æ 
-    __IO float  Proportion;          //±ÈÀı³£Êı P 
-    __IO float  Integral;            //»ı·Ö³£Êı I 
-    __IO float  Derivative;          //Î¢·Ö³£Êı D 
-    __IO float  Error;               //Error[1] 
-    __IO float  LastError;           //Error[-1] 
-    __IO float  PrevError;           //Error[-2] 
+    __IO float SetPoint;    // ç”¨æˆ·ç›®æ ‡å€¼
+    __IO float ActualValue; // PIDè®¡ç®—åè¾“å‡ºå€¼
+    __IO float SumError;    // è¯¯å·®ç´¯è®¡
+    __IO float Proportion;  // æ¯”ä¾‹å¸¸æ•° P
+    __IO float Integral;    // ç§¯åˆ†å¸¸æ•° I
+    __IO float Derivative;  // å¾®åˆ†å¸¸æ•° D
+    __IO float Error;       // Error[1]
+    __IO float LastError;   // Error[-1]
+    __IO float PrevError;   // Error[-2]
 } PID_TypeDef;
 
-extern PID_TypeDef  g_location_pid;  //Î»ÖÃ»·PID²ÎÊı½á¹¹Ìå 
-extern PID_TypeDef  g_speed_pid;     //ËÙ¶È»·PID²ÎÊı½á¹¹Ìå 
-extern PID_TypeDef  g_current_pid;   //µçÁ÷»·PID²ÎÊı½á¹¹Ìå 
+extern PID_TypeDef g_location_pid; // ä½ç½®ç¯PIDå‚æ•°ç»“æ„ä½“
+extern PID_TypeDef g_speed_pid;    // é€Ÿåº¦ç¯PIDå‚æ•°ç»“æ„ä½“
+extern PID_TypeDef g_current_pid;  // ç”µæµç¯PIDå‚æ•°ç»“æ„ä½“
 
 //****************************************************************************************
 
-void pid_init(void);                 //pid³õÊ¼»¯
-int32_t increment_pid_ctrl(PID_TypeDef *PID,float Feedback_value,u8 lose_flag,float lose_n);
-int32_t location_pid_ctrl(PID_TypeDef *PID,float Feedback_value,u8 lose_flag,float lose_n);
-void integral_limit( PID_TypeDef *PID , float max_limit, float min_limit );     //»ı·ÖÏŞ·ù 
+void pid_init(void); // pidåˆå§‹åŒ–
+int32_t increment_pid_ctrl(PID_TypeDef *PID, float Feedback_value, u8 lose_flag, float lose_n);
+int32_t location_pid_ctrl(PID_TypeDef *PID, float Feedback_value, u8 lose_flag, float lose_n);
+void integral_limit(PID_TypeDef *PID, float max_limit, float min_limit); // ç§¯åˆ†é™å¹…
 
 #endif
-

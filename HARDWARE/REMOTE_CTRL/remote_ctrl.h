@@ -1,17 +1,15 @@
 #ifndef __REMOTE_CTRL_H
 #define __REMOTE_CTRL_H
-#include "stdio.h"	
+#include "stdio.h"
 #include "stm32f10x.h"
 
-
-extern u8 front_flag;      //前进命令
-extern u8 back_flag;       //后退命令
-extern u8 turn_left_flag;  //左转命令
-extern u8 turn_right_flag; //右转命令
-extern u8 stop_flag;       //停止命令
-extern u8 voice_flag;      //音频播放命令
+extern u8 front_flag;      // 鍓嶈繘鍛戒护
+extern u8 back_flag;       // 鍚庨��鍛戒护
+extern u8 turn_left_flag;  // 宸﹁浆鍛戒护
+extern u8 turn_right_flag; // 鍙宠浆鍛戒护
+extern u8 stop_flag;       // 鍋滄鍛戒护
+extern u8 voice_flag;      // 闊抽鎾斁鍛戒护
 void MSG_Analyze_BT(void);
 void UI(void);
-
 
 #endif

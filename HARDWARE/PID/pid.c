@@ -1,116 +1,113 @@
 #include "pid.h"
-PID_TypeDef  g_location_pid;    //Î»ÖÃ»·PID²ÎÊý½á¹¹Ìå 
-PID_TypeDef  g_speed_pid;       // ËÙ¶È»·PID²ÎÊý½á¹¹Ìå 
-PID_TypeDef  g_current_pid;     // µçÁ÷»·PID²ÎÊý½á¹¹Ìå 
+PID_TypeDef g_location_pid; // ä½ç½®çŽ¯PIDå‚æ•°ç»“æž„ä½“
+PID_TypeDef g_speed_pid;    // é€Ÿåº¦çŽ¯PIDå‚æ•°ç»“æž„ä½“
+PID_TypeDef g_current_pid;  // ç”µæµçŽ¯PIDå‚æ•°ç»“æž„ä½“
 
-//******************PID³õÊ¼»¯²ÎÊý*************************************
+//******************PIDåˆå§‹åŒ–å‚æ•°*************************************
 void pid_init(void)
 {
-    //³õÊ¼»¯Î»ÖÃ»·PID²ÎÊý 
-    g_location_pid.SetPoint = 0;      //Ä¿±êÖµ 
-    g_location_pid.ActualValue = 0.0;   //PID¼ÆËãºóÊä³öÖµ
-    g_location_pid.SumError = 0.0;      //»ý·ÖÖµ
-    g_location_pid.Error = 0.0;         //Error[1]
-    g_location_pid.LastError = 0.0;     //Error[-1]
-    g_location_pid.PrevError = 0.0;     //Error[-2]
-    g_location_pid.Proportion = L_KP;   //±ÈÀý³£Êý Proportional Const 
-    g_location_pid.Integral = L_KI;     //»ý·Ö³£Êý Integral Const 
-    g_location_pid.Derivative = L_KD;   //Î¢·Ö³£Êý Derivative Const 
+  // åˆå§‹åŒ–ä½ç½®çŽ¯PIDå‚æ•°
+  g_location_pid.SetPoint = 0;      // ç›®æ ‡å€¼
+  g_location_pid.ActualValue = 0.0; // PIDè®¡ç®—åŽè¾“å‡ºå€¼
+  g_location_pid.SumError = 0.0;    // ç§¯åˆ†å€¼
+  g_location_pid.Error = 0.0;       // Error[1]
+  g_location_pid.LastError = 0.0;   // Error[-1]
+  g_location_pid.PrevError = 0.0;   // Error[-2]
+  g_location_pid.Proportion = L_KP; // æ¯”ä¾‹å¸¸æ•° Proportional Const
+  g_location_pid.Integral = L_KI;   // ç§¯åˆ†å¸¸æ•° Integral Const
+  g_location_pid.Derivative = L_KD; // å¾®åˆ†å¸¸æ•° Derivative Const
 
-    //³õÊ¼»¯ËÙ¶È»·PID²ÎÊý 
-    g_speed_pid.SetPoint = 1000;         //Ä¿±êÖµ 
-    g_speed_pid.ActualValue = 0.0;      //PID¼ÆËãºóÊä³öÖµ
-    g_speed_pid.SumError = 0.0;         //»ý·ÖÖµ 
-    g_speed_pid.Error = 0.0;            //Error[1]
-    g_speed_pid.LastError = 0.0;        //Error[-1] 
-    g_speed_pid.PrevError = 0.0;        //Error[-2] 
-    g_speed_pid.Proportion = S_KP;      //±ÈÀý³£Êý Proportional Const 
-    g_speed_pid.Integral = S_KI;        //»ý·Ö³£Êý Integral Const 
-    g_speed_pid.Derivative = S_KD;      //Î¢·Ö³£Êý Derivative Const 
+  // åˆå§‹åŒ–é€Ÿåº¦çŽ¯PIDå‚æ•°
+  g_speed_pid.SetPoint = 1000;   // ç›®æ ‡å€¼
+  g_speed_pid.ActualValue = 0.0; // PIDè®¡ç®—åŽè¾“å‡ºå€¼
+  g_speed_pid.SumError = 0.0;    // ç§¯åˆ†å€¼
+  g_speed_pid.Error = 0.0;       // Error[1]
+  g_speed_pid.LastError = 0.0;   // Error[-1]
+  g_speed_pid.PrevError = 0.0;   // Error[-2]
+  g_speed_pid.Proportion = S_KP; // æ¯”ä¾‹å¸¸æ•° Proportional Const
+  g_speed_pid.Integral = S_KI;   // ç§¯åˆ†å¸¸æ•° Integral Const
+  g_speed_pid.Derivative = S_KD; // å¾®åˆ†å¸¸æ•° Derivative Const
 
-    //³õÊ¼»¯µçÁ÷»·PID²ÎÊý 
-    g_current_pid.SetPoint = 0.0;       //Ä¿±êÖµ 
-    g_current_pid.ActualValue = 0.0;    //PID¼ÆËãºóÊä³öÖµ
-    g_current_pid.SumError = 0.0;       //»ý·ÖÖµ
-    g_current_pid.Error = 0.0;          //Error[1]
-    g_current_pid.LastError = 0.0;      //Error[-1]
-    g_current_pid.PrevError = 0.0;      //Error[-2]
-    g_current_pid.Proportion = C_KP;    //±ÈÀý³£Êý Proportional Const 
-    g_current_pid.Integral = C_KI;      //»ý·Ö³£Êý Integral Const 
-    g_current_pid.Derivative = C_KD;    //Î¢·Ö³£Êý Derivative Const 
+  // åˆå§‹åŒ–ç”µæµçŽ¯PIDå‚æ•°
+  g_current_pid.SetPoint = 0.0;    // ç›®æ ‡å€¼
+  g_current_pid.ActualValue = 0.0; // PIDè®¡ç®—åŽè¾“å‡ºå€¼
+  g_current_pid.SumError = 0.0;    // ç§¯åˆ†å€¼
+  g_current_pid.Error = 0.0;       // Error[1]
+  g_current_pid.LastError = 0.0;   // Error[-1]
+  g_current_pid.PrevError = 0.0;   // Error[-2]
+  g_current_pid.Proportion = C_KP; // æ¯”ä¾‹å¸¸æ•° Proportional Const
+  g_current_pid.Integral = C_KI;   // ç§¯åˆ†å¸¸æ•° Integral Const
+  g_current_pid.Derivative = C_KD; // å¾®åˆ†å¸¸æ•° Derivative Const
 }
-//***************ÔöÁ¿Ê½PID¿ØÖÆº¯Êý************************
-//*PID£ºPID½á¹¹Ìå±äÁ¿µØÖ·
-//Feedback_value£ºµ±Ç°Êµ¼ÊÖµ
-//lose_flag£º¿ÉºöÂÔµÄÎó²î
-//lose_n:¿ÉºöÂÔÎó²îÖµ
-//·µ»ØÖµ£ºPID¼ÆËãºóÊä³öÖµ
-int32_t increment_pid_ctrl(PID_TypeDef *PID,float Feedback_value,u8 lose_flag,float lose_n)
-{   
-	  if(lose_flag==0)
-		{
-		   PID->Error = (float)(PID->SetPoint - Feedback_value);                   //¼ÆËãÆ«²î   
-		}
-    if(lose_flag==1)
-		{
-		  PID->Error = (float)(PID->SetPoint - Feedback_value);
-      if((PID->Error<=lose_n)&&(lose_n>=-lose_n))
-			{
-			 PID->Error =0;
-			}        				
-		}
-    PID->ActualValue += (PID->Proportion * (PID->Error - PID->LastError))                          //±ÈÀý»·½Ú 
-                        + (PID->Integral * PID->Error)                                             //»ý·Ö»·½Ú 
-                        + (PID->Derivative * (PID->Error - 2 * PID->LastError + PID->PrevError));  //Î¢·Ö»·½Ú 
-    
-    PID->PrevError = PID->LastError;                                        //´æ´¢Æ«²î£¬ÓÃÓÚÏÂ´Î¼ÆËã 
-    PID->LastError = PID->Error;
-    return ((int32_t)(PID->ActualValue));                                   //·µ»Ø¼ÆËãºóÊä³öµÄÊýÖµ 
-}
-//***************Î»ÖÃÊ½PID¿ØÖÆº¯Êý************************
-//*PID£ºPID½á¹¹Ìå±äÁ¿µØÖ·
-//Feedback_value£ºµ±Ç°Êµ¼ÊÖµ
-//lose_flag£º¿ÉºöÂÔµÄÎó²î
-//lose_n:¿ÉºöÂÔÎó²îÖµ
-//·µ»ØÖµ£ºPID¼ÆËãºóÊä³öÖµ
-int32_t location_pid_ctrl(PID_TypeDef *PID,float Feedback_value,u8 lose_flag,float lose_n)
+//***************å¢žé‡å¼PIDæŽ§åˆ¶å‡½æ•°************************
+//*PIDï¼šPIDç»“æž„ä½“å˜é‡åœ°å€
+// Feedback_valueï¼šå½“å‰å®žé™…å€¼
+// lose_flagï¼šå¯å¿½ç•¥çš„è¯¯å·®
+// lose_n:å¯å¿½ç•¥è¯¯å·®å€¼
+// è¿”å›žå€¼ï¼šPIDè®¡ç®—åŽè¾“å‡ºå€¼
+int32_t increment_pid_ctrl(PID_TypeDef *PID, float Feedback_value, u8 lose_flag, float lose_n)
 {
-	  if(lose_flag==0)
-		{
-		   PID->Error = (float)(PID->SetPoint - Feedback_value);                   //¼ÆËãÆ«²î   
-		}
-    if(lose_flag==1)
-		{
-		  PID->Error = (float)(PID->SetPoint - Feedback_value);
-      if((PID->Error<=lose_n)&&(lose_n>=-lose_n))
-			{
-			  PID->Error =0;
-				PID->SumError=0;
-			}        				
-		}
-    PID->SumError += PID->Error;
-    PID->ActualValue = (PID->Proportion * PID->Error)                       //±ÈÀý»·½Ú 
-                       + (PID->Integral * PID->SumError)                    //»ý·Ö»·½Ú 
-                       + (PID->Derivative * (PID->Error - PID->LastError)); //Î¢·Ö»·½Ú 
-    PID->LastError = PID->Error;    
-    return ((int32_t)(PID->ActualValue));                                   //·µ»Ø¼ÆËãºóÊä³öµÄÊýÖµ   
+  if (lose_flag == 0)
+  {
+    PID->Error = (float)(PID->SetPoint - Feedback_value); // è®¡ç®—åå·®
+  }
+  if (lose_flag == 1)
+  {
+    PID->Error = (float)(PID->SetPoint - Feedback_value);
+    if ((PID->Error <= lose_n) && (lose_n >= -lose_n))
+    {
+      PID->Error = 0;
+    }
+  }
+  PID->ActualValue += (PID->Proportion * (PID->Error - PID->LastError))                         // æ¯”ä¾‹çŽ¯èŠ‚
+                      + (PID->Integral * PID->Error)                                            // ç§¯åˆ†çŽ¯èŠ‚
+                      + (PID->Derivative * (PID->Error - 2 * PID->LastError + PID->PrevError)); // å¾®åˆ†çŽ¯èŠ‚
+
+  PID->PrevError = PID->LastError; // å­˜å‚¨åå·®ï¼Œç”¨äºŽä¸‹æ¬¡è®¡ç®—
+  PID->LastError = PID->Error;
+  return ((int32_t)(PID->ActualValue)); // è¿”å›žè®¡ç®—åŽè¾“å‡ºçš„æ•°å€¼
 }
-//*************»ý·ÖÏÞ·ù*********************************************
-//*PID£ºPID½á¹¹Ìå±äÁ¿µØÖ·
-//max_limit£º×î´óÖµ
-//min_limit£º×îÐ¡Öµ
-
-
-void integral_limit( PID_TypeDef *PID , float max_limit, float min_limit )
+//***************ä½ç½®å¼PIDæŽ§åˆ¶å‡½æ•°************************
+//*PIDï¼šPIDç»“æž„ä½“å˜é‡åœ°å€
+// Feedback_valueï¼šå½“å‰å®žé™…å€¼
+// lose_flagï¼šå¯å¿½ç•¥çš„è¯¯å·®
+// lose_n:å¯å¿½ç•¥è¯¯å·®å€¼
+// è¿”å›žå€¼ï¼šPIDè®¡ç®—åŽè¾“å‡ºå€¼
+int32_t location_pid_ctrl(PID_TypeDef *PID, float Feedback_value, u8 lose_flag, float lose_n)
 {
-    if (PID->SumError >= max_limit)                           //³¬¹ýÏÞ·ù 
+  if (lose_flag == 0)
+  {
+    PID->Error = (float)(PID->SetPoint - Feedback_value); // è®¡ç®—åå·®
+  }
+  if (lose_flag == 1)
+  {
+    PID->Error = (float)(PID->SetPoint - Feedback_value);
+    if ((PID->Error <= lose_n) && (lose_n >= -lose_n))
     {
-        PID->SumError = max_limit;                            //ÏÞÖÆ»ý·Ö 
+      PID->Error = 0;
+      PID->SumError = 0;
     }
-    else if (PID->SumError <= min_limit)                      //³¬¹ýÏÞ·ù 
-    {
-        PID->SumError = min_limit;
-    }
+  }
+  PID->SumError += PID->Error;
+  PID->ActualValue = (PID->Proportion * PID->Error)                       // æ¯”ä¾‹çŽ¯èŠ‚
+                     + (PID->Integral * PID->SumError)                    // ç§¯åˆ†çŽ¯èŠ‚
+                     + (PID->Derivative * (PID->Error - PID->LastError)); // å¾®åˆ†çŽ¯èŠ‚
+  PID->LastError = PID->Error;
+  return ((int32_t)(PID->ActualValue)); // è¿”å›žè®¡ç®—åŽè¾“å‡ºçš„æ•°å€¼
 }
+//*************ç§¯åˆ†é™å¹…*********************************************
+//*PIDï¼šPIDç»“æž„ä½“å˜é‡åœ°å€
+// max_limitï¼šæœ€å¤§å€¼
+// min_limitï¼šæœ€å°å€¼
 
-
+void integral_limit(PID_TypeDef *PID, float max_limit, float min_limit)
+{
+  if (PID->SumError >= max_limit) // è¶…è¿‡é™å¹…
+  {
+    PID->SumError = max_limit; // é™åˆ¶ç§¯åˆ†
+  }
+  else if (PID->SumError <= min_limit) // è¶…è¿‡é™å¹…
+  {
+    PID->SumError = min_limit;
+  }
+}

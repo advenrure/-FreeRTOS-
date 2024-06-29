@@ -1,125 +1,109 @@
-#include "time.h" 
+#include "time.h"
 #include "motor.h"
 #include "led.h"
 
-u16 time6=0;          //»ù×¼¶¨Ê±µ¥Î»
-u16 time7=0;          //»ù×¼¶¨Ê±µ¥Î»
+u16 time6 = 0; // åŸºå‡†å®šæ—¶å•ä½
+u16 time7 = 0; // åŸºå‡†å®šæ—¶å•ä½
 
-//FreeRTOSÊ±¼äÍ³¼ÆËùÓÃµÄ½ÚÅÄ¼ÆÊıÆ÷
+// FreeRTOSæ—¶é—´ç»Ÿè®¡æ‰€ç”¨çš„èŠ‚æ‹è®¡æ•°å™¨
 volatile unsigned long long FreeRTOSRunTimeTicks;
-//³õÊ¼»¯¶¨Ê±Æ÷×¨ÓÃ
+// åˆå§‹åŒ–å®šæ—¶å™¨ä¸“ç”¨
 void ConfigureTimeForRunTimeStats(void)
 {
-	FreeRTOSRunTimeTicks=0;
-	time7_init();
+  FreeRTOSRunTimeTicks = 0;
+  time7_init();
 }
-//**********************ÅäÖÃÏµÍ³Ê±ÖÓ*********************************
+//**********************é…ç½®ç³»ç»Ÿæ—¶é’Ÿ*********************************
 void TIM6_RCC_Configuration(void)
 {
-  RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM6, ENABLE);  //´ò¿ªtime6µÄÖĞ¶ÏÊ±ÖÓ
+  RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM6, ENABLE); // æ‰“å¼€time6çš„ä¸­æ–­æ—¶é’Ÿ
 }
-//**********************ÅäÖÃÏµÍ³Ê±ÖÓ*********************************
+//**********************é…ç½®ç³»ç»Ÿæ—¶é’Ÿ*********************************
 void TIM7_RCC_Configuration(void)
 {
-  RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM7, ENABLE);  //´ò¿ªtime7µÄÖĞ¶ÏÊ±ÖÓ
+  RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM7, ENABLE); // æ‰“å¼€time7çš„ä¸­æ–­æ—¶é’Ÿ
 }
-//**********************Ê±ÖÓÖĞ¶ÏÅäÖÃº¯Êı*********************************
+//**********************æ—¶é’Ÿä¸­æ–­é…ç½®å‡½æ•°*********************************
 void TIM6_Configuration(void)
 {
-  TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;  
-  TIM_ClearITPendingBit(TIM6,TIM_IT_Update); 	                //Çå³ı¶¨Ê±Æ÷ÖĞ¶Ï
-  TIM_TimeBaseStructure.TIM_Period=3599;                      //¼ÆÊı3600,1ºÁÃë  
-  TIM_TimeBaseStructure.TIM_Prescaler=19;                     //20·ÖÆµ
-  TIM_TimeBaseStructure.TIM_ClockDivision=0;                  //²»ÂË²¨
-  TIM_TimeBaseStructure.TIM_CounterMode=TIM_CounterMode_Up;   //ÏòÉÏ¼ÆÊıÄ£Ê½
-  TIM_TimeBaseInit(TIM6,&TIM_TimeBaseStructure);              //³õÊ¼»¯
-	TIM_ITConfig(TIM6,TIM_IT_Update,ENABLE);                    //´ò¿ª¶¨Ê±Æ÷ÖĞ¶Ï
-	TIM_Cmd(TIM6,ENABLE);                                       //´ò¿ª¶¨Ê±Æ÷ÍâÉè
+  TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
+  TIM_ClearITPendingBit(TIM6, TIM_IT_Update);                 // æ¸…é™¤å®šæ—¶å™¨ä¸­æ–­
+  TIM_TimeBaseStructure.TIM_Period = 3599;                    // è®¡æ•°3600,1æ¯«ç§’
+  TIM_TimeBaseStructure.TIM_Prescaler = 19;                   // 20åˆ†é¢‘
+  TIM_TimeBaseStructure.TIM_ClockDivision = 0;                // ä¸æ»¤æ³¢
+  TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up; // å‘ä¸Šè®¡æ•°æ¨¡å¼
+  TIM_TimeBaseInit(TIM6, &TIM_TimeBaseStructure);             // åˆå§‹åŒ–
+  TIM_ITConfig(TIM6, TIM_IT_Update, ENABLE);                  // æ‰“å¼€å®šæ—¶å™¨ä¸­æ–­
+  TIM_Cmd(TIM6, ENABLE);                                      // æ‰“å¼€å®šæ—¶å™¨å¤–è®¾
 }
 
-//**********************Ê±ÖÓÖĞ¶ÏÅäÖÃº¯Êı*********************************
+//**********************æ—¶é’Ÿä¸­æ–­é…ç½®å‡½æ•°*********************************
 void TIM7_Configuration(void)
 {
-  TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;  
-  TIM_ClearITPendingBit(TIM7,TIM_IT_Update); 	                //Çå³ı¶¨Ê±Æ÷ÖĞ¶Ï
-  TIM_TimeBaseStructure.TIM_Period=36;                        //¼ÆÊı36,10uS
-  TIM_TimeBaseStructure.TIM_Prescaler=20;                     //20·ÖÆµ
-  TIM_TimeBaseStructure.TIM_ClockDivision=0;                  //²»ÂË²¨
-  TIM_TimeBaseStructure.TIM_CounterMode=TIM_CounterMode_Up;   //ÏòÉÏ¼ÆÊıÄ£Ê½
-  TIM_TimeBaseInit(TIM7,&TIM_TimeBaseStructure);              //³õÊ¼»¯
-	TIM_ITConfig(TIM7,TIM_IT_Update,ENABLE);                    //´ò¿ª¶¨Ê±Æ÷ÖĞ¶Ï
-	TIM_Cmd(TIM7,ENABLE);                                       //´ò¿ª¶¨Ê±Æ÷ÍâÉè
+  TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
+  TIM_ClearITPendingBit(TIM7, TIM_IT_Update);                 // æ¸…é™¤å®šæ—¶å™¨ä¸­æ–­
+  TIM_TimeBaseStructure.TIM_Period = 36;                      // è®¡æ•°36,10uS
+  TIM_TimeBaseStructure.TIM_Prescaler = 20;                   // 20åˆ†é¢‘
+  TIM_TimeBaseStructure.TIM_ClockDivision = 0;                // ä¸æ»¤æ³¢
+  TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up; // å‘ä¸Šè®¡æ•°æ¨¡å¼
+  TIM_TimeBaseInit(TIM7, &TIM_TimeBaseStructure);             // åˆå§‹åŒ–
+  TIM_ITConfig(TIM7, TIM_IT_Update, ENABLE);                  // æ‰“å¼€å®šæ—¶å™¨ä¸­æ–­
+  TIM_Cmd(TIM7, ENABLE);                                      // æ‰“å¼€å®šæ—¶å™¨å¤–è®¾
 }
-//**************************ÅäÖÃÓÅÏÈ¼¶***********************************
+//**************************é…ç½®ä¼˜å…ˆçº§***********************************
 void TIM6_NVIC_Configuration(void)
 {
-  NVIC_InitTypeDef NVIC_InitStructure;                        //Îª½á¹¹Ìå¶¨Òå½á¹¹Ìå±äÁ¿
-  NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);             //¶ÔÓÅÏÈ¼¶½øĞĞ·Ö×é
-  NVIC_InitStructure.NVIC_IRQChannel =TIM6_IRQn;              //Íâ²¿ÖĞ¶Ï5Òı½Å
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;   //ÇÀÕ¼ÓÅÏÈ¼¶Îª3
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;          //ÏìÓ¦ÓÅÏÈ¼¶Îª0         
-  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;             //Ê¹ÄÜ
-  NVIC_Init(&NVIC_InitStructure);                             //³õÊ¼»¯
+  NVIC_InitTypeDef NVIC_InitStructure;                      // ä¸ºç»“æ„ä½“å®šä¹‰ç»“æ„ä½“å˜é‡
+  NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);           // å¯¹ä¼˜å…ˆçº§è¿›è¡Œåˆ†ç»„
+  NVIC_InitStructure.NVIC_IRQChannel = TIM6_IRQn;           // å¤–éƒ¨ä¸­æ–­5å¼•è„š
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1; // æŠ¢å ä¼˜å…ˆçº§ä¸º3
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;        // å“åº”ä¼˜å…ˆçº§ä¸º0
+  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;           // ä½¿èƒ½
+  NVIC_Init(&NVIC_InitStructure);                           // åˆå§‹åŒ–
 }
-//**************************ÅäÖÃÓÅÏÈ¼¶***********************************
+//**************************é…ç½®ä¼˜å…ˆçº§***********************************
 void TIM7_NVIC_Configuration(void)
 {
-  NVIC_InitTypeDef NVIC_InitStructure;                        //Îª½á¹¹Ìå¶¨Òå½á¹¹Ìå±äÁ¿
-  NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);             //¶ÔÓÅÏÈ¼¶½øĞĞ·Ö×é
-  NVIC_InitStructure.NVIC_IRQChannel =TIM7_IRQn;              //Íâ²¿ÖĞ¶Ï5Òı½Å
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 3;   //ÇÀÕ¼ÓÅÏÈ¼¶Îª4
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;          //ÏìÓ¦ÓÅÏÈ¼¶Îª0         
-  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;             //Ê¹ÄÜ
-  NVIC_Init(&NVIC_InitStructure);                             //³õÊ¼»¯
+  NVIC_InitTypeDef NVIC_InitStructure;                      // ä¸ºç»“æ„ä½“å®šä¹‰ç»“æ„ä½“å˜é‡
+  NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);           // å¯¹ä¼˜å…ˆçº§è¿›è¡Œåˆ†ç»„
+  NVIC_InitStructure.NVIC_IRQChannel = TIM7_IRQn;           // å¤–éƒ¨ä¸­æ–­5å¼•è„š
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 3; // æŠ¢å ä¼˜å…ˆçº§ä¸º4
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;        // å“åº”ä¼˜å…ˆçº§ä¸º0
+  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;           // ä½¿èƒ½
+  NVIC_Init(&NVIC_InitStructure);                           // åˆå§‹åŒ–
 }
-//*********************¶¨Ê±Æ÷³õÊ¼»¯********************************************
+//*********************å®šæ—¶å™¨åˆå§‹åŒ–********************************************
 void time6_init(void)
 {
   TIM6_RCC_Configuration();
-	TIM6_Configuration();
+  TIM6_Configuration();
   TIM6_NVIC_Configuration();
 }
-//*********************¶¨Ê±Æ÷³õÊ¼»¯********************************************
+//*********************å®šæ—¶å™¨åˆå§‹åŒ–********************************************
 void time7_init(void)
 {
   TIM7_RCC_Configuration();
-	TIM7_Configuration();
+  TIM7_Configuration();
   TIM7_NVIC_Configuration();
 }
-//*************************************ÖĞ¶Ïº¯ÊıÅäÖÃ ***************************
+//*************************************ä¸­æ–­å‡½æ•°é…ç½® ***************************
 void TIM6_IRQHandler(void)
 {
-	time6++;	
-  MPU6050_Data_read();	//»ñÈ¡ÍÓÂİÒÇÊı¾İ	
-	if(time6>=5)
-	{
-		time6=0;  
-	  Moto_Speed_Read(1); //¶ÁÈ¡ËÙ¶È
-	  Moto_Speed_Read(2);	//¶ÁÈ¡ËÙ¶È
-	  
-	}
-  Smart_Car_Task();     //Æ½ºâ³µÔË¶¯ÈÎÎñ	
-  TIM_ClearITPendingBit(TIM6,TIM_IT_Update); 	         //Çå³ı¶¨Ê±Æ÷ÖĞ¶Ï	
+  time6++;
+  MPU6050_Data_read(); // è·å–é™€èºä»ªæ•°æ®
+  if (time6 >= 5)
+  {
+    time6 = 0;
+    Moto_Speed_Read(1); // è¯»å–é€Ÿåº¦
+    Moto_Speed_Read(2); // è¯»å–é€Ÿåº¦
+  }
+  Smart_Car_Task();                           // å¹³è¡¡è½¦è¿åŠ¨ä»»åŠ¡
+  TIM_ClearITPendingBit(TIM6, TIM_IT_Update); // æ¸…é™¤å®šæ—¶å™¨ä¸­æ–­
 }
-//*************************************ÖĞ¶Ïº¯ÊıÅäÖÃ ***************************
+//*************************************ä¸­æ–­å‡½æ•°é…ç½® ***************************
 void TIM7_IRQHandler(void)
 {
-	//time7++;		
-	FreeRTOSRunTimeTicks++;   //10uSÒ»´Î
-  TIM_ClearITPendingBit(TIM7,TIM_IT_Update); 	         //Çå³ı¶¨Ê±Æ÷ÖĞ¶Ï	
+  // time7++;
+  FreeRTOSRunTimeTicks++;                     // 10uSä¸€æ¬¡
+  TIM_ClearITPendingBit(TIM7, TIM_IT_Update); // æ¸…é™¤å®šæ—¶å™¨ä¸­æ–­
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

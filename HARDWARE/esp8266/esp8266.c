@@ -4,38 +4,37 @@
 #include "usart2.h"
 #include "delay.h"
 
-char a[]="AT+CWMODE=1";
-char b[]="AT+RST";
-char c[]="AT+CWJAP=\"lfh\",\"81009738\"";                
-char d[]="AT+CIPMUX=1";
-char e[]="AT+CIPSTART=0,\"TCP\",\"115.29.109.104\",6552";
-char f[]="AT+CWLAP";
+char a[] = "AT+CWMODE=1";
+char b[] = "AT+RST";
+char c[] = "AT+CWJAP=\"lfh\",\"81009738\"";
+char d[] = "AT+CIPMUX=1";
+char e[] = "AT+CIPSTART=0,\"TCP\",\"115.29.109.104\",6552";
+char f[] = "AT+CWLAP";
 
 void esp8266_start_trans(void)
 {
-		//ÖØÆô
+	// é‡å¯
 	esp8266_send_cmd1((u8 *)b);
-  delay_xms(1000);
+	delay_xms(1000);
 	delay_xms(1000);
 	delay_xms(1000);
 	delay_xms(1000);
 
-
-	//ÉèÖÃ¹¤×÷Ä£Ê½ 1£ºstationÄ£Ê½   2£ºAPÄ£Ê½  3£º¼æÈİ AP+stationÄ£Ê½
+	// è®¾ç½®å·¥ä½œæ¨¡å¼ 1ï¼šstationæ¨¡å¼   2ï¼šAPæ¨¡å¼  3ï¼šå…¼å®¹ AP+stationæ¨¡å¼
 	esp8266_send_cmd1((u8 *)a);
 	delay_xms(1000);
 	delay_xms(1000);
-	
-	//ÖØÆô
+
+	// é‡å¯
 	esp8266_send_cmd1((u8 *)b);
-  delay_xms(1000);
+	delay_xms(1000);
 	delay_xms(1000);
 	delay_xms(1000);
 	delay_xms(1000);
 
-	//Á¬½ÓWIFI
+	// è¿æ¥WIFI
 	esp8266_send_cmd1((u8 *)c);
-  delay_xms(1000);
+	delay_xms(1000);
 	delay_xms(1000);
 	delay_xms(1000);
 	delay_xms(1000);
@@ -44,21 +43,16 @@ void esp8266_start_trans(void)
 	delay_xms(1000);
 	delay_xms(1000);
 
-	
 	esp8266_send_cmd1((u8 *)d);
-  delay_xms(1000);
+	delay_xms(1000);
 	delay_xms(1000);
 
 	esp8266_send_cmd1((u8 *)e);
-  delay_xms(1000);
 	delay_xms(1000);
-
+	delay_xms(1000);
 }
 
 void esp8266_send_cmd1(u8 *cmd)
 {
-  u2_printf("%s\r\n",cmd);	//·¢ËÍÃüÁî£¬ĞèÒª¼Ó»»ĞĞ·û
-
+	u2_printf("%s\r\n", cmd); // å‘é€å‘½ä»¤ï¼Œéœ€è¦åŠ æ¢è¡Œç¬¦
 }
- 
-

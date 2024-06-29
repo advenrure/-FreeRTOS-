@@ -1,19 +1,18 @@
 #ifndef __KEY_H
-#define __KEY_H	 
+#define __KEY_H
 #include "stm32f10x.h"
- 
-#define KEY1 	 	GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_9)//ºê¶¨Òå¶ÁÈ¡PA1Òı½Å
-#define KEY2  	GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_8)//ºê¶¨Òå¶ÁÈ¡PA2Òı½Å
-#define WK_UP   GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_0)//ºê¶¨Òå¶ÁÈ¡PA3Òı½Å
- 
-#define KEY2_PRES 	3
-#define KEY1_PRES	  2
-#define WKUP_PRES   1
+
+#define KEY1 GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_9)  // å®å®šä¹‰è¯»å–PA1å¼•è„š
+#define KEY2 GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_8)  // å®å®šä¹‰è¯»å–PA2å¼•è„š
+#define WK_UP GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0) // å®å®šä¹‰è¯»å–PA3å¼•è„š
+
+#define KEY2_PRES 3
+#define KEY1_PRES 2
+#define WKUP_PRES 1
 #define WKUP_PRES_long 4
- 
-void KEY_Init(void);//³õÊ¼»¯º¯ÊıÉùÃ÷
-u8 KEY_Scan(u8);//°´¼üÉ¨Ãèº¯ÊıÉùÃ÷
+
+void KEY_Init(void); // åˆå§‹åŒ–å‡½æ•°å£°æ˜
+u8 KEY_Scan(u8);     // æŒ‰é”®æ‰«æå‡½æ•°å£°æ˜
 void key_sta_chage(void);
- 
- 
-#endif 
+
+#endif

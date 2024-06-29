@@ -1,69 +1,69 @@
-//#include "exti.h"
-//#include "led.h"
-//#include "key.h"
-//#include "delay.h"
-//#include "FreeRTOS.h"
-//#include "task.h"
-////////////////////////////////////////////////////////////////////////////////////	 
-////±¾³ÌĞòÖ»¹©Ñ§Ï°Ê¹ÓÃ£¬Î´¾­×÷ÕßĞí¿É£¬²»µÃÓÃÓÚÆäËüÈÎºÎÓÃÍ¾
-////ALIENTEKÕ½½¢STM32¿ª·¢°å
-////Íâ²¿ÖĞ¶Ï Çı¶¯´úÂë	   
-////ÕıµãÔ­×Ó@ALIENTEK
-////¼¼ÊõÂÛÌ³:www.openedv.com
-////ĞŞ¸ÄÈÕÆÚ:2012/9/3
-////°æ±¾£ºV1.0
-////°æÈ¨ËùÓĞ£¬µÁ°æ±Ø¾¿¡£
-////Copyright(C) ¹ãÖİÊĞĞÇÒíµç×Ó¿Æ¼¼ÓĞÏŞ¹«Ë¾ 2009-2019
-////All rights reserved									  
-////////////////////////////////////////////////////////////////////////////////////   
-////Íâ²¿ÖĞ¶Ï0·şÎñ³ÌĞò
-//void EXTIX_Init(void)
+// #include "exti.h"
+// #include "led.h"
+// #include "key.h"
+// #include "delay.h"
+// #include "FreeRTOS.h"
+// #include "task.h"
+////////////////////////////////////////////////////////////////////////////////////
+////æœ¬ç¨‹åºåªä¾›å­¦ä¹ ä½¿ç”¨ï¼Œæœªç»ä½œè€…è®¸å¯ï¼Œä¸å¾—ç”¨äºå…¶å®ƒä»»ä½•ç”¨é€”
+////ALIENTEKæˆ˜èˆ°STM32å¼€å‘æ¿
+////å¤–éƒ¨ä¸­æ–­ é©±åŠ¨ä»£ç 
+////æ­£ç‚¹åŸå­@ALIENTEK
+////æŠ€æœ¯è®ºå›:www.openedv.com
+////ä¿®æ”¹æ—¥æœŸ:2012/9/3
+////ç‰ˆæœ¬ï¼šV1.0
+////ç‰ˆæƒæ‰€æœ‰ï¼Œç›—ç‰ˆå¿…ç©¶ã€‚
+////Copyright(C) å¹¿å·å¸‚æ˜Ÿç¿¼ç”µå­ç§‘æŠ€æœ‰é™å…¬å¸ 2009-2019
+////All rights reserved
+////////////////////////////////////////////////////////////////////////////////////
+////å¤–éƒ¨ä¸­æ–­0æœåŠ¡ç¨‹åº
+// void EXTIX_Init(void)
 //{
-// 
-// 	EXTI_InitTypeDef EXTI_InitStructure;
-// 	NVIC_InitTypeDef NVIC_InitStructure;
+//
+//  	EXTI_InitTypeDef EXTI_InitStructure;
+//  	NVIC_InitTypeDef NVIC_InitStructure;
 
-//    KEY_Init();	 //	°´¼ü¶Ë¿Ú³õÊ¼»¯
+//    KEY_Init();	 //	æŒ‰é”®ç«¯å£åˆå§‹åŒ–
 
-//  	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO,ENABLE);	//Ê¹ÄÜ¸´ÓÃ¹¦ÄÜÊ±ÖÓ
+//  	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO,ENABLE);	//ä½¿èƒ½å¤ç”¨åŠŸèƒ½æ—¶é’Ÿ
 
-//   //GPIOE.4	  ÖĞ¶ÏÏßÒÔ¼°ÖĞ¶Ï³õÊ¼»¯ÅäÖÃ  ÏÂ½µÑØ´¥·¢	//KEY0
+//   //GPIOE.4	  ä¸­æ–­çº¿ä»¥åŠä¸­æ–­åˆå§‹åŒ–é…ç½®  ä¸‹é™æ²¿è§¦å‘	//KEY0
 //  	GPIO_EXTILineConfig(GPIO_PortSourceGPIOE,GPIO_PinSource4);
 
 //	EXTI_InitStructure.EXTI_Line=EXTI_Line4;
-//  	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;	
+//  	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
 //  	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Falling;
 //  	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-//  	EXTI_Init(&EXTI_InitStructure);	 	//¸ù¾İEXTI_InitStructÖĞÖ¸¶¨µÄ²ÎÊı³õÊ¼»¯ÍâÉèEXTI¼Ä´æÆ÷
+//  	EXTI_Init(&EXTI_InitStructure);	 	//æ ¹æ®EXTI_InitStructä¸­æŒ‡å®šçš„å‚æ•°åˆå§‹åŒ–å¤–è®¾EXTIå¯„å­˜å™¨
 
-//	NVIC_InitStructure.NVIC_IRQChannel = EXTI4_IRQn;				//Ê¹ÄÜ°´¼üKEY0ËùÔÚµÄÍâ²¿ÖĞ¶ÏÍ¨µÀ
-//  	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x06;	//ÇÀÕ¼ÓÅÏÈ¼¶6
-//  	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x00;			//×ÓÓÅÏÈ¼¶0 
-//  	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;					//Ê¹ÄÜÍâ²¿ÖĞ¶ÏÍ¨µÀ
-//  	NVIC_Init(&NVIC_InitStructure);  	  //¸ù¾İNVIC_InitStructÖĞÖ¸¶¨µÄ²ÎÊı³õÊ¼»¯ÍâÉèNVIC¼Ä´æÆ÷
-// 
+//	NVIC_InitStructure.NVIC_IRQChannel = EXTI4_IRQn;				//ä½¿èƒ½æŒ‰é”®KEY0æ‰€åœ¨çš„å¤–éƒ¨ä¸­æ–­é€šé“
+//  	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x06;	//æŠ¢å ä¼˜å…ˆçº§6
+//  	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x00;			//å­ä¼˜å…ˆçº§0
+//  	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;					//ä½¿èƒ½å¤–éƒ¨ä¸­æ–­é€šé“
+//  	NVIC_Init(&NVIC_InitStructure);  	  //æ ¹æ®NVIC_InitStructä¸­æŒ‡å®šçš„å‚æ•°åˆå§‹åŒ–å¤–è®¾NVICå¯„å­˜å™¨
+//
 //}
 
-////ÈÎÎñ¾ä±ú
-//extern TaskHandle_t Task2Task_Handler;
+////ä»»åŠ¡å¥æŸ„
+// extern TaskHandle_t Task2Task_Handler;
 
-////Íâ²¿ÖĞ¶Ï4·şÎñ³ÌĞò
-//void EXTI4_IRQHandler(void)
+////å¤–éƒ¨ä¸­æ–­4æœåŠ¡ç¨‹åº
+// void EXTI4_IRQHandler(void)
 //{
 //	BaseType_t YieldRequired;
-//	
-//	delay_xms(20);	//Ïû¶¶
-//	if(KEY0==0)	 
-//	{				 
-//		YieldRequired=xTaskResumeFromISR(Task2Task_Handler);//»Ö¸´ÈÎÎñ2
-//		printf("»Ö¸´ÈÎÎñ2µÄÔËĞĞ!\r\n");
+//
+//	delay_xms(20);	//æ¶ˆæŠ–
+//	if(KEY0==0)
+//	{
+//		YieldRequired=xTaskResumeFromISR(Task2Task_Handler);//æ¢å¤ä»»åŠ¡2
+//		printf("æ¢å¤ä»»åŠ¡2çš„è¿è¡Œ!\r\n");
 //		if(YieldRequired==pdTRUE)
 //		{
-//			/*Èç¹ûº¯ÊıxTaskResumeFromISR()·µ»ØÖµÎªpdTRUE£¬ÄÇÃ´ËµÃ÷Òª»Ö¸´µÄÕâ¸ö
-//			ÈÎÎñµÄÈÎÎñÓÅÏÈ¼¶µÈÓÚ»òÕß¸ßÓÚÕıÔÚÔËĞĞµÄÈÎÎñ(±»ÖĞ¶Ï´ò¶ÏµÄÈÎÎñ),ËùÒÔÔÚ
-//			ÍË³öÖĞ¶ÏµÄÊ±ºòÒ»¶¨Òª½øĞĞÉÏÏÂÎÄÇĞ»»£¡*/
+//			/*å¦‚æœå‡½æ•°xTaskResumeFromISR()è¿”å›å€¼ä¸ºpdTRUEï¼Œé‚£ä¹ˆè¯´æ˜è¦æ¢å¤çš„è¿™ä¸ª
+//			ä»»åŠ¡çš„ä»»åŠ¡ä¼˜å…ˆçº§ç­‰äºæˆ–è€…é«˜äºæ­£åœ¨è¿è¡Œçš„ä»»åŠ¡(è¢«ä¸­æ–­æ‰“æ–­çš„ä»»åŠ¡),æ‰€ä»¥åœ¨
+//			é€€å‡ºä¸­æ–­çš„æ—¶å€™ä¸€å®šè¦è¿›è¡Œä¸Šä¸‹æ–‡åˆ‡æ¢ï¼*/
 //			portYIELD_FROM_ISR(YieldRequired);
 //		}
-//	}		 
-//	 EXTI_ClearITPendingBit(EXTI_Line4);//Çå³ıLINE4ÉÏµÄÖĞ¶Ï±êÖ¾Î»  
-//}
+//	}
+//	 EXTI_ClearITPendingBit(EXTI_Line4);//æ¸…é™¤LINE4ä¸Šçš„ä¸­æ–­æ ‡å¿—ä½
+// }
